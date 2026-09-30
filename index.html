@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prismo Studio — produtos digitais prontos para o seu negócio</title>
+<meta name="description" content="A Prismo Studio cria produtos digitais prontos para usar, com a sua marca — como uma plataforma completa de agendamento para negócios de serviço.">
+<meta name="theme-color" content="#08080a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Geist:wght@300..600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #08080a;
+    --surface: #111114;
+    --line: rgba(255, 255, 255, .09);
+    --text: #f4f2ee;
+    --muted: #a3a09a;
+    --spectrum: linear-gradient(100deg, #ff6b6b, #ffb86b, #f5e27a, #7ee0a8, #6bc4ff, #9a7bff, #e07bff);
+    --serif: "Fraunces", Georgia, serif;
+    --sans: "Geist", system-ui, sans-serif;
+    --wrap: min(1180px, 100% - 3rem);
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html { scroll-behavior: smooth; }
+  section[id] { scroll-margin-top: 4.5rem; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font: 300 1.0625rem/1.65 var(--sans);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  a { color: inherit; text-decoration: none; }
+  :focus-visible { outline: 2px solid #6bc4ff; outline-offset: 4px; border-radius: 4px; }
+  .wrap { width: var(--wrap); margin-inline: auto; }
+  .eyebrow {
+    font-size: .75rem; letter-spacing: .22em; text-transform: uppercase; color: var(--muted);
+  }
+  .spectrum-text {
+    background: var(--spectrum); -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  h1, h2, h3 { font-family: var(--serif); font-weight: 300; letter-spacing: -.02em; line-height: 1.05; }
+
+  /* Nav */
+  header {
+    position: fixed; inset: 0 0 auto; z-index: 10;
+    backdrop-filter: blur(14px) saturate(140%);
+    background: rgba(8, 8, 10, .6);
+    border-bottom: 1px solid var(--line);
+  }
+  nav { display: flex; align-items: center; justify-content: space-between; height: 4.5rem; }
+  .logo { display: flex; align-items: center; gap: .7rem; font-weight: 500; letter-spacing: .02em; }
+  .logo svg { width: 26px; height: 26px; }
+  .logo span { color: var(--muted); font-weight: 300; }
+  nav ul { display: flex; gap: 2.25rem; list-style: none; padding: 0; font-size: .9rem; color: var(--muted); }
+  nav ul a:hover { color: var(--text); }
+  .btn {
+    display: inline-flex; align-items: center; gap: .6rem;
+    padding: .8rem 1.4rem; border-radius: 999px; font-size: .9rem; font-weight: 400;
+    border: 1px solid var(--line); transition: background .3s, border-color .3s, transform .3s;
+  }
+  .btn:hover { border-color: rgba(255, 255, 255, .3); transform: translateY(-1px); }
+  .btn-solid { background: var(--text); color: var(--bg); border-color: var(--text); font-weight: 500; }
+  .btn-solid:hover { background: #fff; }
+
+  /* Hero */
+  .hero {
+    position: relative; min-height: 100svh; display: grid; align-items: center;
+    padding: 8rem 0 5rem; isolation: isolate; overflow: hidden;
+  }
+  .beam {
+    position: absolute; z-index: -1; top: 50%; left: 50%;
+    width: 140vmax; height: 140vmax; translate: -30% -50%;
+    background: conic-gradient(from 200deg at 50% 50%, transparent 0deg, #ff6b6b22 12deg, #ffb86b33 20deg, #f5e27a33 28deg, #7ee0a833 36deg, #6bc4ff33 44deg, #9a7bff33 52deg, transparent 64deg);
+    filter: blur(40px);
+    animation: drift 18s ease-in-out infinite alternate;
+  }
+  .hero::after {
+    content: ""; position: absolute; inset: 0; z-index: -1;
+    background: radial-gradient(ellipse at 20% 40%, transparent 30%, var(--bg) 75%);
+  }
+  @keyframes drift { to { rotate: 12deg; } }
+  .hero h1 { font-size: clamp(3rem, 8.5vw, 7.5rem); max-width: 12ch; margin: 1.5rem 0 2rem; }
+  .hero h1 em { font-style: italic; }
+  .hero p { max-width: 36rem; color: var(--muted); font-size: 1.2rem; }
+  .hero .actions { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 2.75rem; }
+  .prism {
+    position: absolute; right: max(1.5rem, calc((100vw - 1180px) / 2)); top: 50%; translate: 0 -50%;
+    width: clamp(220px, 30vw, 420px); z-index: -1; opacity: .9;
+  }
+
+  /* Sections */
+  section { padding: clamp(5rem, 12vw, 9rem) 0; }
+  .section-head { display: grid; gap: 1.25rem; max-width: 44rem; margin-bottom: 4rem; }
+  .section-head h2 { font-size: clamp(2.2rem, 5vw, 3.8rem); }
+  .divider { height: 1px; background: var(--spectrum); opacity: .35; }
+
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 24px; overflow: hidden; }
+  .card { background: var(--bg); padding: 2.5rem 2.25rem 2.75rem; transition: background .4s; }
+  .card:hover { background: var(--surface); }
+  .card .num { font-family: var(--serif); font-style: italic; color: var(--muted); font-size: 1.1rem; }
+  .card h3 { font-size: 1.75rem; margin: 3rem 0 1rem; }
+  .card p { color: var(--muted); font-size: .98rem; }
+
+  /* Product teaser */
+  .product {
+    position: relative; border: 1px solid var(--line); border-radius: 28px; overflow: hidden;
+    display: grid; grid-template-columns: 1.1fr .9fr; gap: 3rem; align-items: center;
+    padding: clamp(2.5rem, 6vw, 5rem);
+    background: radial-gradient(circle at 100% 0%, #9a7bff1f, transparent 55%), radial-gradient(circle at 0% 100%, #6bc4ff14, transparent 50%), var(--surface);
+  }
+  .product::before { content: ""; position: absolute; inset: 0 0 auto; height: 1px; background: var(--spectrum); }
+  .badge {
+    display: inline-flex; align-items: center; gap: .55rem; padding: .4rem .9rem; border-radius: 999px;
+    border: 1px solid var(--line); font-size: .78rem; color: var(--muted); width: fit-content;
+  }
+  .badge i { width: 7px; height: 7px; border-radius: 50%; background: #7ee0a8; box-shadow: 0 0 12px #7ee0a8; animation: pulse 2.4s infinite; }
+  @keyframes pulse { 50% { opacity: .35; } }
+  .product h2 { font-size: clamp(2rem, 4.2vw, 3.2rem); margin: 1.5rem 0 1.25rem; }
+  .product p { color: var(--muted); max-width: 32rem; }
+  .slots { display: grid; gap: .75rem; }
+  .slot {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1rem 1.25rem; border-radius: 14px; border: 1px solid var(--line); background: rgba(255, 255, 255, .02);
+    font-size: .92rem;
+  }
+  .slot small { color: var(--muted); }
+  .slot.active { border-color: transparent; background: linear-gradient(var(--surface), var(--surface)) padding-box, var(--spectrum) border-box; border: 1px solid transparent; }
+  .slot.active b { font-weight: 500; }
+
+  .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin-top: 1.5rem; background: var(--line); border: 1px solid var(--line); border-radius: 24px; overflow: hidden; }
+  .features article { background: var(--bg); padding: 2rem 2rem 2.25rem; }
+  .features h3 { font-size: 1.35rem; margin-bottom: .7rem; }
+  .features p { color: var(--muted); font-size: .95rem; }
+  .roles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 4rem; }
+  .roles div { border-top: 1px solid var(--line); padding-top: 1.5rem; }
+  .roles .eyebrow { margin-bottom: .8rem; }
+  .roles p:not(.eyebrow) { color: var(--muted); font-size: .95rem; }
+
+  /* Principles */
+  .principles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; }
+  .principles div { border-top: 1px solid var(--line); padding-top: 1.5rem; }
+  .principles h3 { font-size: 1.35rem; margin-bottom: .6rem; }
+  .principles p { color: var(--muted); font-size: .95rem; }
+
+  /* CTA */
+  .cta { text-align: center; }
+  .cta h2 { font-size: clamp(2.6rem, 7vw, 5.5rem); max-width: 17ch; margin: 1.5rem auto 2.5rem; }
+
+  footer { border-top: 1px solid var(--line); padding: 2.5rem 0; color: var(--muted); font-size: .85rem; }
+  footer .wrap { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+
+  /* Reveal */
+  .js .reveal { opacity: 0; translate: 0 24px; transition: opacity .9s ease, translate .9s ease; }
+  .reveal.in { opacity: 1; translate: 0 0; }
+
+  @media (max-width: 900px) {
+    nav ul { display: none; }
+    .grid, .product, .roles { grid-template-columns: 1fr; }
+    .features { grid-template-columns: 1fr 1fr; }
+    .principles { grid-template-columns: 1fr 1fr; }
+    .prism { opacity: .35; right: -60px; }
+  }
+  @media (max-width: 520px) {
+    .principles, .features { grid-template-columns: 1fr; }
+    header .btn { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .js .reveal { opacity: 1; translate: none; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="wrap" aria-label="Principal">
+    <a href="#" class="logo" aria-label="Prismo Studio — início">
+      <svg viewBox="0 0 32 32" aria-hidden="true">
+        <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff6b6b"/><stop offset=".5" stop-color="#6bc4ff"/><stop offset="1" stop-color="#e07bff"/></linearGradient></defs>
+        <path d="M16 3 29 27H3Z" fill="none" stroke="url(#lg)" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M16 3v24" stroke="url(#lg)" stroke-width="1" opacity=".6"/>
+      </svg>
+      Prismo <span>Studio</span>
+    </a>
+    <ul>
+      <li><a href="#produtos">Produtos</a></li>
+      <li><a href="#agendamento">Agendamento</a></li>
+      <li><a href="#principios">Princípios</a></li>
+    </ul>
+    <a href="#contato" class="btn">Fale conosco</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="beam" aria-hidden="true"></div>
+    <svg class="prism" viewBox="0 0 200 180" aria-hidden="true">
+      <defs>
+        <linearGradient id="pf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".12"/><stop offset="1" stop-color="#fff" stop-opacity=".02"/></linearGradient>
+        <linearGradient id="ps" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".5"/><stop offset="1" stop-color="#fff" stop-opacity=".08"/></linearGradient>
+      </defs>
+      <path d="M100 8 192 170H8Z" fill="url(#pf)" stroke="url(#ps)" stroke-width="1"/>
+      <path d="M100 8 120 170" stroke="#fff" stroke-opacity=".15"/>
+    </svg>
+
+    <div class="wrap">
+      <p class="eyebrow">Produtos digitais prontos para usar</p>
+      <h1>Seu negócio entra. <em class="spectrum-text">Sai em espectro.</em></h1>
+      <p>A Prismo Studio cria produtos digitais prontos para o seu negócio — desenhados com cuidado, construídos com rigor e entregues com a sua marca. Sem projeto sob medida, sem meses de espera.</p>
+      <div class="actions">
+        <a href="#agendamento" class="btn btn-solid">Conheça o Agendamento <span aria-hidden="true">→</span></a>
+        <a href="#produtos" class="btn">Como funciona</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap divider" aria-hidden="true"></div>
+
+  <section id="produtos">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="eyebrow">Produtos, não projetos</p>
+        <h2>Tudo pronto. Só falta a sua marca.</h2>
+      </div>
+      <div class="grid reveal">
+        <article class="card">
+          <span class="num">01</span>
+          <h3>Pronto para usar</h3>
+          <p>Nada de levantar requisitos ou esperar desenvolvimento. O produto já existe, já foi testado e começa a trabalhar para você assim que é configurado.</p>
+        </article>
+        <article class="card">
+          <span class="num">02</span>
+          <h3>Com a sua cara</h3>
+          <p>Logo, cores, capa e tipografia são seus. Seus clientes veem a sua marca — a Prismo fica nos bastidores.</p>
+        </article>
+        <article class="card">
+          <span class="num">03</span>
+          <h3>Sempre evoluindo</h3>
+          <p>Melhorias chegam continuamente para todos os clientes, sem você precisar pedir, contratar ou atualizar nada.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="agendamento">
+    <div class="wrap">
+      <div class="product reveal">
+        <div>
+          <span class="badge"><i aria-hidden="true"></i> Em desenvolvimento</span>
+          <h2>Agendamento, <em>reimaginado.</em></h2>
+          <p>Uma plataforma completa de agendamento para barbearias e negócios de serviço com hora marcada. Um app com a sua marca para os seus clientes, e as ferramentas que a sua equipe precisa para atender, cobrar e crescer.</p>
+        </div>
+        <div class="slots" aria-hidden="true">
+          <div class="slot"><span>09:30</span><small>Indisponível</small></div>
+          <div class="slot active"><b>10:15</b><small>Reservado para você</small></div>
+          <div class="slot"><span>11:00</span><small>Disponível</small></div>
+          <div class="slot"><span>11:45</span><small>Disponível</small></div>
+        </div>
+      </div>
+
+      <div class="features reveal">
+        <article><h3>Seu app, sua marca</h3><p>O aplicativo veste as cores, o logo e a tipografia do seu negócio. Com várias unidades, cada uma pode ter a própria identidade.</p></article>
+        <article><h3>Agenda que não erra</h3><p>Horário de funcionamento, expediente de cada profissional, pausas e feriados. O cliente só vê o que está realmente livre.</p></article>
+        <article><h3>Entrada sem senha</h3><p>Clientes e profissionais entram com um código enviado pelo WhatsApp. Nada para decorar, nada para recuperar.</p></article>
+        <article><h3>Check-in por QR code</h3><p>Cada reserva gera um código. O profissional escaneia e o atendimento começa nas duas telas no mesmo instante.</p></article>
+        <article><h3>Pagamento e divisão automática</h3><p>O cliente paga pelo app ou no balcão. O valor é dividido entre o estabelecimento e o profissional conforme as regras que você define.</p></article>
+        <article><h3>Preço sem surpresa</h3><p>O preço anunciado é o preço cobrado. Qualquer serviço extra combinado na hora só entra na conta depois que o cliente aceita no app.</p></article>
+        <article><h3>Planos de assinatura</h3><p>Venda pacotes recorrentes: um conjunto de serviços, uma quantidade e uma validade. Fidelidade em troca de desconto.</p></article>
+        <article><h3>Avaliações de verdade</h3><p>Só quem foi atendido avalia, e avaliações não podem ser apagadas — o estabelecimento responde publicamente. Reputação que o cliente confia.</p></article>
+        <article><h3>Relatórios</h3><p>Ocupação da equipe, clientes novos, faltas e faturamento, sempre calculados a partir dos registros reais da sua operação.</p></article>
+      </div>
+
+      <div class="roles reveal">
+        <div><p class="eyebrow">Para o cliente</p><p>Encontra a unidade, escolhe o serviço e o profissional, vê a reputação de cada um e reserva em poucos toques.</p></div>
+        <div><p class="eyebrow">Para o profissional</p><p>Vê a própria agenda do dia, faz o check-in pelo QR code, registra extras e acompanha quanto ganhou.</p></div>
+        <div><p class="eyebrow">Para o gestor</p><p>Configura unidades, catálogo, equipe e horários; acompanha o dia, as avaliações e os números do negócio.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="principios">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="eyebrow">Princípios</p>
+        <h2>O que não negociamos.</h2>
+      </div>
+      <div class="principles reveal">
+        <div><h3>Clareza</h3><p>Cada tela responde uma pergunta. O resto sai.</p></div>
+        <div><h3>Precisão</h3><p>Detalhe não é enfeite — é o que separa o bom do excelente.</p></div>
+        <div><h3>Durabilidade</h3><p>Produtos pensados para o terceiro ano de uso, não para a demonstração.</p></div>
+        <div><h3>Transparência</h3><p>Regras claras para o seu negócio e para os seus clientes, sem letras miúdas.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap divider" aria-hidden="true"></div>
+
+  <section id="contato" class="cta">
+    <div class="wrap reveal">
+      <p class="eyebrow">Vamos conversar</p>
+      <h2>Quer usar no seu negócio? <span class="spectrum-text">Fale com a gente.</span></h2>
+      <a href="mailto:contato@prismo.studio" class="btn btn-solid">contato@prismo.studio <span aria-hidden="true">→</span></a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© <span id="year">2026</span> Prismo Studio · 69.411.284 RYAN RIBEIRO DE JESUS PIMENTEL · CNPJ 69.411.284/0001-05</span>
+    <span>Produtos digitais prontos para o seu negócio</span>
+  </div>
+</footer>
+
+<script>
+  document.documentElement.classList.add('js');
+  document.getElementById('year').textContent = new Date().getFullYear();
+  const io = new IntersectionObserver(entries => entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+  }), { threshold: .15 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
