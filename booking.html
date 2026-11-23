@@ -1,0 +1,833 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prismo Booking — o app de agendamento com o nome do seu negócio</title>
+<meta name="description" content="Prismo Booking: o app de agendamento com o nome, o logo e as cores do seu negócio. Seus clientes marcam, pagam e avaliam; sua equipe atende pelo celular; você acompanha os números.">
+<meta name="theme-color" content="#08080a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Geist:wght@300..600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #08080a;
+    --surface: #111114;
+    --line: rgba(255, 255, 255, .09);
+    --text: #f4f2ee;
+    --muted: #a3a09a;
+    --spectrum: linear-gradient(100deg, #ff6b6b, #ffb86b, #f5e27a, #7ee0a8, #6bc4ff, #9a7bff, #e07bff);
+    --serif: "Fraunces", Georgia, serif;
+    --sans: "Geist", system-ui, sans-serif;
+    --wrap: min(1180px, 100% - 3rem);
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html { scroll-behavior: smooth; scrollbar-color: #2a2a2e var(--bg); }
+  ::selection { background: #9a7bff; color: #08080a; }
+  section[id] { scroll-margin-top: 4.5rem; }
+  body {
+    background: var(--bg); color: var(--text);
+    font: 300 1.0625rem/1.65 var(--sans);
+    -webkit-font-smoothing: antialiased; overflow-x: hidden;
+  }
+  a { color: inherit; text-decoration: none; }
+  :focus-visible { outline: 2px solid #6bc4ff; outline-offset: 4px; border-radius: 4px; }
+  img { display: block; max-width: 100%; height: auto; }
+  .wrap { width: var(--wrap); margin-inline: auto; }
+  h1, h2, h3 { font-family: var(--serif); font-weight: 300; letter-spacing: -.02em; line-height: 1.05; text-wrap: balance; }
+  h2 { font-size: clamp(2.2rem, 4.6vw, 3.6rem); }
+  h1 em, h2 em { font-style: italic; }
+  p { text-wrap: pretty; }
+  b { font-weight: 500; color: var(--text); }
+  .for { margin-top: 1rem; font-size: .92rem; color: var(--muted); max-width: 32rem; }
+  .lede { color: var(--muted); font-size: 1.15rem; max-width: 34rem; margin-top: 1.3rem; }
+
+
+  /* Nav */
+  header {
+    position: fixed; inset: 0 0 auto; z-index: 10;
+    backdrop-filter: blur(14px) saturate(140%); background: rgba(8, 8, 10, .72);
+    border-bottom: 1px solid var(--line);
+  }
+  nav { display: flex; align-items: center; justify-content: space-between; height: 4.5rem; }
+  .logo { display: flex; align-items: center; gap: .7rem; font-weight: 500; letter-spacing: .02em; }
+  .logo svg { width: 26px; height: 26px; }
+  .logo span { color: var(--muted); font-weight: 300; }
+  nav ul { display: flex; gap: 2rem; list-style: none; padding: 0; font-size: .9rem; color: var(--muted); }
+  nav ul a:hover { color: var(--text); }
+  .btn {
+    display: inline-flex; align-items: center; gap: .6rem; padding: .8rem 1.4rem; border-radius: 999px;
+    font-size: .9rem; font-weight: 400; border: 1px solid var(--line);
+    transition: background .3s, border-color .3s, transform .3s cubic-bezier(.2, .8, .2, 1);
+  }
+  .btn:hover { border-color: rgba(255, 255, 255, .3); transform: translateY(-1px); }
+  .btn-solid { background: var(--text); color: var(--bg); border-color: var(--text); font-weight: 500; }
+  .btn-solid:hover { background: #fff; }
+  .btn svg { width: 16px; height: 16px; }
+
+  /* Telefone com a tela real do app */
+  .phone {
+    width: 280px; flex: none; padding: 9px; border-radius: 46px;
+    background: linear-gradient(160deg, #2c2c31, #111114 40%, #1d1d21);
+    box-shadow: 0 40px 80px -30px #000, inset 0 0 0 1px #ffffff14;
+  }
+  .phone img { width: 100%; aspect-ratio: 390 / 844; border-radius: 37px; object-fit: cover; object-position: top; background: #000; }
+
+  /* Hero */
+  .hero { position: relative; padding: 9rem 0 6rem; isolation: isolate; overflow: hidden; }
+  .beam {
+    position: absolute; z-index: -1; top: 40%; left: 50%; width: 140vmax; height: 140vmax; translate: -30% -50%;
+    background: conic-gradient(from 200deg at 50% 50%, transparent 0deg, #ff6b6b1c 12deg, #ffb86b2a 20deg, #f5e27a2a 28deg, #7ee0a82a 36deg, #6bc4ff2a 44deg, #9a7bff2a 52deg, transparent 64deg);
+    filter: blur(40px); animation: drift 18s ease-in-out infinite alternate;
+  }
+  .hero::after { content: ""; position: absolute; inset: 0; z-index: -1; background: radial-gradient(ellipse at 25% 40%, transparent 30%, var(--bg) 78%); }
+  @keyframes drift { to { rotate: 12deg; } }
+  .hero-grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: 3rem; align-items: center; }
+  .hero h1 { font-size: clamp(2.8rem, 6.4vw, 5.6rem); max-width: 13ch; }
+  .hero .lede { font-size: 1.2rem; max-width: 32rem; }
+  .actions { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 2.5rem; }
+  .hero .phone { justify-self: center; rotate: 2deg; width: 300px; }
+
+  section { padding: clamp(5rem, 11vw, 8.5rem) 0; }
+  .divider { height: 1px; background: var(--spectrum); opacity: .3; }
+  .split { display: grid; grid-template-columns: 1fr auto; gap: clamp(2rem, 6vw, 6rem); align-items: center; }
+  .split.flip { grid-template-columns: auto 1fr; }
+  .split.flip > .phones, .split.flip > .phone { order: -1; }
+  .phones { display: flex; gap: 1.25rem; align-items: flex-start; }
+  .phones .phone:nth-child(2) { margin-top: 3rem; }
+  .points { list-style: none; padding: 0; margin-top: 2rem; display: grid; gap: .9rem; max-width: 32rem; }
+  .points li { padding-left: 1.6rem; position: relative; color: var(--muted); }
+  .points li::before { content: ""; position: absolute; left: 0; top: .8em; width: .7rem; height: 1px; background: var(--muted); }
+
+  /* Estilos */
+  .styles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; margin-top: 4rem; }
+  .styles figure { display: grid; gap: 1.1rem; justify-items: center; text-align: center; }
+  .styles .phone { width: 100%; max-width: 270px; }
+  .styles figure:nth-child(even) { margin-top: 3rem; }
+  .styles figcaption { font-size: .92rem; color: var(--muted); }
+  .styles figcaption b { display: block; font-family: var(--serif); font-weight: 400; font-size: 1.3rem; }
+  .editor { display: grid; grid-template-columns: auto 1fr; gap: clamp(2rem, 5vw, 4.5rem); align-items: center; margin-top: 6rem; padding: clamp(2rem, 5vw, 3.5rem); border-radius: 28px; border: 1px solid var(--line); background: radial-gradient(circle at 0% 0%, #9a7bff17, transparent 55%), var(--surface); position: relative; overflow: hidden; }
+  .editor::before { content: ""; position: absolute; inset: 0 0 auto; height: 1px; background: var(--spectrum); }
+  .editor h3 { font-size: clamp(1.8rem, 3vw, 2.4rem); }
+
+  /* Fluxo */
+  .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; margin-top: 4rem; }
+  .flow figure { display: grid; gap: 1.5rem; align-content: start; }
+  .flow .phone { width: 100%; max-width: 270px; }
+  .flow h3 { font-size: 1.45rem; margin-bottom: .4rem; }
+  .flow figcaption p { color: var(--muted); font-size: .95rem; max-width: 26ch; }
+
+  .tags { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.75rem; list-style: none; padding: 0; }
+  .tags li { padding: .45rem .9rem; border: 1px solid var(--line); border-radius: 999px; font-size: .88rem; color: var(--muted); }
+
+  .more { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem 2.5rem; margin-top: 3.5rem; }
+  .more div { border-top: 1px solid var(--line); padding-top: 1.4rem; }
+  .more h3 { font-size: 1.35rem; margin-bottom: .5rem; }
+  .more p { color: var(--muted); font-size: .95rem; }
+  .more.three { grid-template-columns: repeat(3, 1fr); }
+
+  .flow.three { grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 5rem; }
+  .flow.three .phone { max-width: 300px; }
+  .flow.three figcaption p { max-width: 34ch; }
+  .points.wide { grid-template-columns: 1fr 1fr; gap: 1.1rem 3rem; max-width: none; margin-top: 4rem; }
+
+  /* Telefone deitado (música) */
+  .phone.land { width: 100%; max-width: 760px; border-radius: 40px; }
+  .phone.land img { aspect-ratio: 844 / 390; border-radius: 32px; }
+  .land-hero { margin-top: 3.5rem; display: flex; justify-content: center; }
+  .music { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.5rem; margin-top: 4rem; }
+  .music div { border-top: 1px solid var(--line); padding-top: 1.4rem; }
+  .music h3 { font-size: 1.45rem; margin-bottom: .6rem; }
+  .music p { color: var(--muted); font-size: .97rem; }
+  .lands { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 4rem; }
+
+  .steps { list-style: none; padding: 0; counter-reset: s; display: grid; gap: 1.5rem; align-content: center; }
+  .steps.start { grid-template-columns: repeat(3, 1fr); gap: 2.5rem; margin-top: 3rem; }
+  .steps.start li { border-top: 1px solid var(--line); padding-top: 1.4rem; }
+  .steps li { counter-increment: s; display: grid; grid-template-columns: 2.2rem 1fr; gap: .5rem; color: var(--muted); font-size: .95rem; }
+  .steps li::before { content: counter(s); font: italic 400 1.4rem/1 var(--serif); color: var(--text); }
+  .steps b { display: block; margin-bottom: .2rem; }
+
+  .faq { margin-top: 3rem; max-width: 50rem; }
+  .faq details { border-top: 1px solid var(--line); }
+  .faq details:last-child { border-bottom: 1px solid var(--line); }
+  .faq summary { cursor: pointer; list-style: none; padding: 1.25rem 0; font-size: 1.08rem; display: flex; justify-content: space-between; gap: 1rem; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: ""; width: 10px; height: 10px; border-right: 1px solid var(--muted); border-bottom: 1px solid var(--muted); rotate: 45deg; margin-top: .35rem; flex: none; transition: rotate .3s; }
+  .faq details[open] summary::after { rotate: 225deg; }
+  .faq details p { color: var(--muted); padding: 0 0 1.4rem; max-width: 42rem; }
+
+  .cta { text-align: center; }
+  .cta h2 { font-size: clamp(2.4rem, 6vw, 4.8rem); max-width: 16ch; margin: 0 auto; }
+  .cta .lede { margin: 1.4rem auto 2.5rem; }
+
+  footer { border-top: 1px solid var(--line); padding: 2.5rem 0; color: var(--muted); font-size: .85rem; }
+  footer .wrap { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+
+  @media (max-width: 1080px) {
+    .flow, .styles { grid-template-columns: repeat(2, 1fr); gap: 3rem 1.5rem; }
+    .flow .phone, .styles .phone { justify-self: center; }
+    .flow figure { justify-items: center; text-align: center; }
+    .styles figure:nth-child(even) { margin-top: 0; }
+    .more { grid-template-columns: 1fr 1fr; }
+    .flow.three, .music { grid-template-columns: 1fr; }
+    .flow.three figure { grid-template-columns: auto 1fr; align-items: center; text-align: left; justify-items: start; gap: 2rem; }
+    .flow.three .phone { width: 220px; }
+  }
+  @media (max-width: 900px) {
+    nav ul { display: none; }
+    .hero-grid, .split, .split.flip, .price-box, .editor { grid-template-columns: minmax(0, 1fr); }
+    .split.flip > .phones, .split.flip > .phone { order: 0; }
+    .split > .phone, .split > .phones, .editor .phone { justify-self: center; }
+  }
+  @media (max-width: 600px) {
+    .phones { justify-content: center; }
+    .phones .phone { width: 46%; min-width: 0; flex: 0 1 auto; padding: 6px; border-radius: 30px; }
+    .phones .phone img { border-radius: 25px; }
+    .phones .phone:nth-child(2) { margin-top: 2rem; }
+    .styles, .flow { grid-template-columns: 1fr 1fr; gap: 2.5rem 1rem; }
+    .styles .phone, .flow .phone { padding: 6px; border-radius: 30px; }
+    .styles .phone img, .flow .phone img { border-radius: 25px; }
+    .flow figcaption p { font-size: .88rem; }
+    .flow h3 { font-size: 1.2rem; }
+    .more, .more.three, .reports, .points.wide, .lands { grid-template-columns: 1fr; }
+    .flow.three { grid-template-columns: 1fr; }
+    .flow.three figure { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+    .flow.three .phone { width: 70%; }
+    .phone.land { padding: 6px; border-radius: 26px; }
+    .phone.land img { border-radius: 21px; }
+    .steps.start { grid-template-columns: 1fr; gap: 1.5rem; }
+    header .btn { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+<style>
+  /* Representações visuais (sem telas do app) */
+  .num { font-family: "Geist Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; font-weight: 500; }
+  .mut { color: var(--muted); }
+  .viz {
+    position: relative; border: 1px solid var(--line); border-radius: 24px; padding: 1.75rem;
+    background: radial-gradient(circle at 100% 0%, #9a7bff14, transparent 55%), var(--surface);
+  }
+  .viz::before { content: ""; position: absolute; inset: 0 24px auto; height: 1px; background: var(--spectrum); opacity: .55; }
+  .viz-head { display: flex; justify-content: space-between; align-items: baseline; font-size: .92rem; font-weight: 400; }
+  .viz-foot { margin-top: 1.4rem; padding-top: 1.1rem; border-top: 1px solid var(--line); font-size: .95rem; color: var(--muted); }
+  .split-foot { display: flex; justify-content: space-between; align-items: baseline; }
+  .split-foot .num { color: var(--text); font-size: 1.25rem; }
+  .split2 { display: grid; grid-template-columns: 1fr minmax(0, 30rem); gap: clamp(2rem, 7vw, 7rem); align-items: center; }
+  .split2.flip { grid-template-columns: minmax(0, 30rem) 1fr; }
+  .split2.flip > .viz { order: -1; }
+
+  /* Fluxo em 4 passos */
+  .steps4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; margin-top: 3.5rem; }
+  .steps4 figure { display: grid; gap: 1.25rem; align-content: start; }
+  .steps4 h3 { font-size: 1.4rem; margin-bottom: .3rem; }
+  .steps4 figcaption p { color: var(--muted); font-size: .95rem; }
+  .tile { height: 15rem; display: grid; place-items: center; padding: 1.25rem; }
+  .slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; width: 100%; }
+  .chip { padding: .55rem 0; text-align: center; border: 1px solid #ffffff22; border-radius: 10px; font: 500 .85rem "Geist Mono", monospace; }
+  .chip.gone { color: #5c5c62; border-color: #ffffff0d; text-decoration: line-through; }
+  .chip.on { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .qr { width: 9.5rem; padding: .7rem; background: #fff; border-radius: 16px; }
+  .qr svg { display: block; width: 100%; }
+  .ask { width: 100%; display: grid; gap: .15rem; }
+  .ask small { color: var(--muted); font-size: .8rem; }
+  .ask b { font: 500 1.5rem var(--sans); }
+  .ask .num { color: var(--muted); }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin-top: 1rem; font-size: .85rem; text-align: center; }
+  .pair span { padding: .6rem; border: 1px solid #ffffff22; border-radius: 999px; }
+  .pair .yes { background: var(--text); color: var(--bg); border-color: var(--text); font-weight: 500; }
+  .paid { display: grid; justify-items: center; gap: .35rem; }
+  .ring { width: 4.2rem; height: 4.2rem; border-radius: 50%; display: grid; place-items: center; border: 1px solid #30d15866; background: #30d15814; margin-bottom: .5rem; }
+  .ring svg, .ok svg { width: 1.8rem; fill: none; stroke: #30d158; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  .paid b { font-size: 1.35rem; }
+  .paid small { color: var(--muted); font-size: .82rem; }
+
+  /* Plano */
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; align-items: end; }
+  .col { display: grid; gap: .3rem; }
+  .col b { font-size: 1.4rem; margin-top: .7rem; }
+  .col small { color: var(--muted); font-size: .82rem; }
+  .stack { display: grid; gap: 4px; align-content: end; height: 13rem; }
+  .stack span { padding: .55rem .7rem; border-radius: 8px; background: #ffffff10; border: 1px solid #ffffff14; font-size: .8rem; color: #d6d4cf; }
+  .stack .gold { height: 6.6rem; display: grid; align-items: end; background: linear-gradient(160deg, #f2cf74, #c9902a); color: #2b1d00; font-weight: 600; border: 0; }
+  .stack .save { border: 1px dashed #e8b23a99; background: transparent; color: #e8b23a; text-align: center; font-family: "Geist Mono", monospace; height: 5.8rem; display: grid; place-items: center; }
+  .gold-t { color: #e8b23a; font-weight: 500; }
+
+  /* Agenda do barbeiro */
+  .agenda { list-style: none; padding: 0; margin-top: 1rem; display: grid; }
+  .agenda li { display: grid; grid-template-columns: 3.4rem 1fr auto; gap: .75rem; align-items: center; padding: .85rem 0; border-bottom: 1px solid var(--line); font-size: .93rem; }
+  .agenda li:last-child { border: 0; }
+  .agenda em { font-style: normal; font-size: .8rem; color: var(--muted); }
+  .agenda .done { color: #30d158; }
+  .agenda .now { margin: 0 -.75rem; padding-inline: .75rem; border-radius: 12px; background: #ffd60a12; border: 1px solid #ffd60a33; }
+  .live { display: inline-flex; align-items: center; gap: .4rem; color: #ffd60a !important; }
+  .live i { width: 7px; height: 7px; border-radius: 50%; background: #ffd60a; animation: pulse 1.8s infinite; }
+  @keyframes pulse { 50% { opacity: .3; } }
+
+  /* Receita */
+  .up { color: #30d158; font: 500 .9rem "Geist Mono", monospace; }
+  .big { display: block; font-size: 2.1rem; margin-top: .4rem; letter-spacing: -.02em; }
+  .bars { display: flex; align-items: flex-end; gap: 4px; height: 9rem; margin-top: 1.4rem; }
+  .bars span { position: relative; flex: 1; height: var(--h); border-radius: 3px 3px 0 0; background: linear-gradient(#e8b23a, #b07a00); }
+  .bars span::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: var(--p); border-top: 2px solid #ffffff55; }
+  .legend { display: flex; gap: 1.25rem; margin-top: .9rem; font-size: .78rem; color: var(--muted); }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: .4rem; vertical-align: -1px; }
+  .k-now { background: #e8b23a; } .k-prev { border-top: 2px solid #ffffff77; height: 0 !important; vertical-align: 3px !important; }
+
+  /* Campanhas */
+  .camp { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-top: 3.5rem; }
+  .camp figure { display: grid; gap: 1.25rem; align-content: start; }
+  .camp .viz { height: 16rem; display: grid; align-content: center; }
+  .camp h3 { font-size: 1.4rem; margin-bottom: .3rem; }
+  .camp figcaption p { color: var(--muted); font-size: .95rem; }
+  .recipes { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: .5rem; }
+  .recipes li { padding: .5rem .9rem; border-radius: 999px; border: 1px solid #ffffff22; font-size: .85rem; color: #d6d4cf; }
+  .recipes .on { background: var(--text); color: var(--bg); border-color: var(--text); font-weight: 500; }
+  .ab { display: grid; gap: .9rem; }
+  .ab div { display: grid; grid-template-columns: 1.4rem 1fr 3rem; gap: .7rem; align-items: center; }
+  .ab span { font: 500 .85rem var(--sans); color: var(--muted); }
+  .ab i { height: .9rem; border-radius: 999px; background: linear-gradient(90deg, #ffffff40 var(--w), #ffffff0d var(--w)); }
+  .ab .win i { background: linear-gradient(90deg, #e8b23a var(--w), #ffffff0d var(--w)); }
+  .ab .win b { color: #e8b23a; }
+  .ab b { font-size: .9rem; text-align: right; }
+  .ab small { color: var(--muted); font-size: .8rem; margin-top: .3rem; }
+  .funnel { display: grid; gap: 5px; justify-items: center; }
+  .funnel span { width: var(--w); display: flex; justify-content: space-between; padding: .55rem .85rem; border-radius: 8px; font-size: .82rem; background: linear-gradient(90deg, #ffffff14, #ffffff08); }
+  .funnel span:nth-child(3) { background: linear-gradient(90deg, #e8b23a40, #e8b23a1a); }
+  .funnel p { margin-top: .8rem; font-size: 1.15rem; color: #30d158; }
+  .funnel p small { font: 400 .8rem var(--sans); color: var(--muted); margin-left: .3rem; }
+
+  /* Música */
+  .np { display: grid; grid-template-columns: 4rem 1fr auto; gap: 1rem; align-items: center; }
+  .art { width: 4rem; height: 4rem; border-radius: 12px; background: radial-gradient(circle at 30% 30%, #ffb86b, #ff6b6b 45%, #6b2a3a 90%); box-shadow: 0 10px 24px -10px #ff6b6b88; }
+  .np b { display: block; font-weight: 500; font-size: 1.05rem; }
+  .np small { display: block; font-size: .85rem; }
+  .who { display: inline-block; margin-top: .35rem; font-size: .75rem; padding: .2rem .55rem; border-radius: 999px; background: #ff8a6b1f; color: #ffb39c; }
+  .eq { display: flex; gap: 3px; align-items: flex-end; height: 1.4rem; }
+  .eq i { width: 4px; height: 100%; border-radius: 2px; background: #ff8a6b; transform-origin: bottom; animation: eq 1.1s ease-in-out infinite; }
+  .eq i:nth-child(2) { animation-delay: -.4s; } .eq i:nth-child(3) { animation-delay: -.8s; } .eq i:nth-child(4) { animation-delay: -.2s; }
+  @keyframes eq { 0%, 100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
+  .prog { height: 3px; border-radius: 2px; background: #ffffff14; margin: 1.3rem 0 .4rem; overflow: hidden; }
+  .prog i { display: block; width: 42%; height: 100%; background: #ff8a6b; }
+  .queue { list-style: none; padding: 0; margin-top: 1rem; }
+  .queue li { display: flex; justify-content: space-between; gap: 1rem; padding: .7rem 0; border-top: 1px solid var(--line); font-size: .9rem; }
+  .queue small { color: var(--muted); }
+  .talk { display: inline-block; margin-top: 1.1rem; padding: .6rem 1rem; border-radius: 999px; border: 1px solid #ffffff22; font-size: .85rem; }
+  .trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.5rem; margin-top: 4rem; }
+  .trio div { border-top: 1px solid var(--line); padding-top: 1.3rem; }
+  .trio h3 { font-size: 1.4rem; margin-bottom: .4rem; }
+  .trio p { color: var(--muted); font-size: .95rem; }
+
+  /* Avaliação */
+  .stars { color: #ffd60a; letter-spacing: .12em; }
+  .ok { display: inline-flex; align-items: center; gap: .45rem; margin-top: .8rem; font-size: .8rem; color: #8fe3a5; padding: .3rem .7rem .3rem .5rem; border-radius: 999px; background: #30d15814; }
+  .ok svg { width: 1rem; }
+  .quote { margin-top: 1rem; font: 300 1.25rem/1.4 var(--serif); }
+  .rv .reply { margin-top: 1.2rem; padding: .9rem 1rem; border-radius: 14px; background: #ffffff08; font-size: .9rem; color: var(--muted); }
+  .rv .reply small { display: block; color: var(--text); font-size: .78rem; font-weight: 500; margin-bottom: .2rem; }
+
+  /* Planos: detalhes */
+  .plans-mini { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; align-items: end; }
+  .plans-mini div { display: grid; gap: .2rem; padding: .9rem; border-radius: 14px; border: 1px solid #ffffff1c; background: #ffffff08; }
+  .plans-mini b { font-weight: 500; font-size: .92rem; }
+  .plans-mini .num { font-size: 1.15rem; }
+  .plans-mini small { color: var(--muted); font-size: .75rem; }
+  .plans-mini .best { border-color: #e8b23a; background: #e8b23a12; }
+  .plans-mini em { justify-self: start; font-style: normal; font-size: .68rem; font-weight: 600; padding: .15rem .5rem; border-radius: 999px; background: #e8b23a; color: #2b1d00; margin-bottom: .3rem; }
+  .covered { display: grid; gap: 1rem; }
+  .chip.goldf { border-color: #e8b23a; color: #f2cf74; background: #e8b23a12; }
+  .free { justify-self: start; display: inline-flex; align-items: center; gap: .4rem; font-size: .82rem; color: #f2cf74; }
+  .free svg { width: 1rem; fill: #e8b23a; }
+  .renew ul { list-style: none; padding: 0; margin-top: .8rem; }
+  .renew li { display: grid; grid-template-columns: 1fr auto; gap: .1rem .8rem; padding: .7rem 0; border-top: 1px solid var(--line); font-size: .9rem; }
+  .renew small { grid-column: 1; color: var(--muted); font-size: .78rem; }
+  .renew em { grid-row: 1 / 3; grid-column: 2; align-self: center; font-style: normal; font-size: .75rem; padding: .35rem .7rem; border-radius: 999px; background: #25d36622; color: #7ee0a8; }
+
+  /* Relatórios: detalhes */
+  .paysplit { display: flex; gap: 3px; margin-top: 1.2rem; font-size: .72rem; }
+  .paysplit i { flex: var(--w) 1 0; min-width: max-content; font-style: normal; padding: .45rem .5rem; border-radius: 6px; background: #ffffff10; color: #d6d4cf; white-space: nowrap; }
+  .paysplit i:first-child { background: #e8b23a33; color: #f2cf74; }
+  .heat { display: grid; grid-template-columns: repeat(11, 1fr); gap: 3px; }
+  .heat span { aspect-ratio: 1; border-radius: 3px; }
+  .ret b { font-size: 2.4rem; letter-spacing: -.02em; display: block; }
+  .ret small { color: var(--muted); font-size: .85rem; }
+  .retbar { height: .8rem; border-radius: 999px; background: #ffffff10; margin-top: 1.1rem; overflow: hidden; }
+  .retbar i { display: block; width: var(--w); height: 100%; background: linear-gradient(90deg, #7ee0a8, #30d158); }
+  .pros { list-style: none; padding: 0; display: grid; gap: .9rem; }
+  .pros li { display: grid; grid-template-columns: 3.6rem 1fr auto auto; gap: .6rem; align-items: center; font-size: .85rem; }
+  .pros i { height: .55rem; border-radius: 999px; background: linear-gradient(90deg, #e8b23a var(--w), #ffffff0d var(--w)); }
+  .pros em { font-style: normal; color: #ffd60a; font-size: .78rem; }
+  .more-reports { margin-top: 2.5rem; }
+  .aviso { display: flex; gap: .6rem; align-items: flex-start; margin-top: 2.5rem; max-width: 46rem; font-size: .85rem; color: var(--muted); }
+  .aviso svg { width: 1.05rem; flex: none; margin-top: .15rem; fill: none; stroke: var(--muted); stroke-width: 1.8; stroke-linecap: round; }
+
+  @media (max-width: 1080px) {
+    .steps4 { grid-template-columns: 1fr 1fr; gap: 2.5rem 1.25rem; }
+  }
+  @media (max-width: 900px) {
+    .split2, .split2.flip { grid-template-columns: minmax(0, 1fr); }
+    .split2.flip > .viz { order: 0; }
+    .camp, .trio { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px) {
+    .steps4 { grid-template-columns: 1fr; }
+    .tile { height: 13rem; }
+    .viz { padding: 1.35rem; }
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+
+<header>
+  <nav class="wrap" aria-label="Principal">
+    <a href="/" class="logo" aria-label="Prismo Studio — início">
+      <svg viewBox="0 0 32 32" aria-hidden="true">
+        <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff6b6b"/><stop offset=".5" stop-color="#6bc4ff"/><stop offset="1" stop-color="#e07bff"/></linearGradient></defs>
+        <path d="M16 3 29 27H3Z" fill="none" stroke="url(#lg)" stroke-width="2" stroke-linejoin="round"/>
+      </svg>
+      Prismo <span>Booking</span>
+    </a>
+    <ul>
+      <li><a href="#marca">Sua marca</a></li>
+      <li><a href="#atendimento">Como funciona</a></li>
+      <li><a href="#gestao">Gestão</a></li>
+      <li><a href="#campanhas">Campanhas</a></li>
+      <li><a href="#musica">Música</a></li>
+      <li><a href="#comecar">Como começar</a></li>
+    </ul>
+    <a href="#contato" class="btn">Pedir demonstração</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="beam" aria-hidden="true"></div>
+    <div class="wrap hero-grid">
+      <div>
+        <h1>O app de agendamento com o <em>nome do seu negócio.</em></h1>
+        <p class="lede">Seus clientes marcam, pagam e avaliam pelo app da sua marca. Você acompanha o dia e o caixa de onde estiver.</p>
+        <p class="for">Para barbearias, salões, clínicas, estúdios e todo negócio que atende com hora marcada.</p>
+        <div class="actions">
+          <a href="#contato" class="btn btn-solid">Pedir uma demonstração <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+          <a href="#marca" class="btn">Ver o app</a>
+        </div>
+      </div>
+      <div class="phone"><img src="telas/inicio.webp" width="390" height="844" alt="Tela inicial do app do Estúdio Alvorada: foto do espaço, saudação à cliente Marina e o próximo agendamento, corte masculino com João Batista."></div>
+    </div>
+  </section>
+
+  <div class="wrap divider" aria-hidden="true"></div>
+
+  <section id="marca">
+    <div class="wrap">
+      <h2>Um app que <em>parece o seu negócio.</em></h2>
+      <p class="lede">Escolha o estilo e aplique o seu logo, as suas cores e a foto do seu espaço. O app vai para as lojas com o nome do seu negócio.</p>
+
+      <div class="styles">
+        <figure>
+          <div class="phone"><img src="telas/estilo-cartao.webp" width="390" height="844" loading="lazy" alt="Estilo Cartão: o próximo agendamento e um cartão de vidro com a foto da barbearia e o nome da cliente."></div>
+          <figcaption><b>Cartão</b>A foto do seu espaço num cartão com o nome do cliente</figcaption>
+        </figure>
+        <figure>
+          <div class="phone"><img src="telas/estilo-capa.webp" width="390" height="844" loading="lazy" alt="Estilo Capa: a foto da barbearia ocupa a tela, com o plano da cliente e os serviços grátis por cima."></div>
+          <figcaption><b>Capa</b>A foto do seu espaço de fundo, de ponta a ponta</figcaption>
+        </figure>
+        <figure>
+          <div class="phone"><img src="telas/estilo-brutal.webp" width="390" height="844" loading="lazy" alt="Estilo Brutalista: blocos com bordas grossas e um pôster com a foto e o nome da barbearia."></div>
+          <figcaption><b>Brutalista</b>Blocos, bordas grossas e um pôster da casa</figcaption>
+        </figure>
+        <figure>
+          <div class="phone"><img src="telas/estilo-deco.webp" width="390" height="844" loading="lazy" alt="Estilo Art déco: saudação sob um leque, serviços do plano como chaves douradas e uma placa com o nome da barbearia."></div>
+          <figcaption><b>Art déco</b>Dourado, molduras e o ar de um salão clássico</figcaption>
+        </figure>
+      </div>
+
+      <div class="editor">
+        <div class="phone"><img src="telas/marca.webp" width="390" height="844" loading="lazy" alt="Editor de marca: prévia do app ao vivo, cor principal e segunda cor, com sugestões de cores."></div>
+        <div>
+          <h3>Você mesmo ajusta, <em>vendo a prévia.</em></h3>
+          <p class="lede">Troque cores, fotos, fonte e estilo e veja o app mudar antes de salvar.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap divider" aria-hidden="true"></div>
+
+  <section id="atendimento">
+    <div class="wrap">
+      <h2>Do agendamento ao pagamento, <em>tudo no celular.</em></h2>
+      <div class="steps4">
+        <figure>
+          <div class="viz tile" aria-hidden="true">
+            <div class="slots">
+              <span class="chip gone">09:00</span><span class="chip">09:30</span><span class="chip">10:00</span>
+              <span class="chip gone">14:00</span><span class="chip on">14:30</span><span class="chip">15:00</span>
+              <span class="chip">16:30</span><span class="chip gone">17:00</span><span class="chip">17:30</span>
+            </div>
+          </div>
+          <figcaption><h3>Escolhe o horário</h3><p>Serviço, profissional e horário em poucos toques.</p></figcaption>
+        </figure>
+        <figure>
+          <div class="viz tile" aria-hidden="true"><div class="qr"><svg id="qr" viewBox="0 0 25 25" shape-rendering="crispEdges"></svg></div></div>
+          <figcaption><h3>Mostra o código</h3><p>O profissional lê o QR code e o atendimento começa.</p></figcaption>
+        </figure>
+        <figure>
+          <div class="viz tile" aria-hidden="true">
+            <div class="ask">
+              <small>João quer incluir</small>
+              <b>Barba</b><span class="num">+ R$ 30,00</span>
+              <div class="pair"><span>Recusar</span><span class="yes">Aceitar</span></div>
+            </div>
+          </div>
+          <figcaption><h3>Aprova o extra</h3><p>O cliente aceita no app antes de entrar na conta.</p></figcaption>
+        </figure>
+        <figure>
+          <div class="viz tile" aria-hidden="true">
+            <div class="paid"><span class="ring"><svg viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7"/></svg></span><b class="num">R$ 75,00</b><small>Pago com Pix</small></div>
+          </div>
+          <figcaption><h3>Paga pelo app</h3><p>Pix ou cartão na hora, ou no balcão.</p></figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap divider" aria-hidden="true"></div>
+
+  <section id="planos">
+    <div class="wrap">
+      <div class="split2">
+        <div>
+          <h2>Clube de assinatura, <em>pronto para vender.</em></h2>
+          <p class="lede">Assinatura é dinheiro certo todo mês e cliente que volta sempre. Você monta o plano e o app faz a venda, mostrando ao cliente quanto ele economiza.</p>
+        </div>
+        <div class="viz" role="img" aria-label="Quatro cortes de R$ 55,00 somam R$ 220,00 sem o plano; com o plano, R$ 128,00. Economia de R$ 92,00 por mês.">
+          <div class="compare">
+            <div class="col">
+              <div class="stack"><span>Corte · R$ 55</span><span>Corte · R$ 55</span><span>Corte · R$ 55</span><span>Corte · R$ 55</span></div>
+              <b class="num">R$ 220</b><small>sem o plano</small>
+            </div>
+            <div class="col">
+              <div class="stack"><span class="save">− R$ 92</span><span class="gold">Clube Corte</span></div>
+              <b class="num">R$ 128</b><small>com o plano</small>
+            </div>
+          </div>
+          <p class="viz-foot"><span class="gold-t">Economize R$ 92,00</span> todo mês</p>
+        </div>
+      </div>
+
+      <div class="camp">
+        <figure>
+          <div class="viz" aria-hidden="true">
+            <div class="plans-mini">
+              <div><b>Corte mensal</b><span class="num">R$ 90</span><small>4 cortes</small></div>
+              <div class="best"><em>Melhor valor</em><b>Corte e barba</b><span class="num">R$ 128</span><small>4 cortes + 2 barbas</small></div>
+            </div>
+          </div>
+          <figcaption><h3>Monte do seu jeito</h3><p>Escolha os serviços, as quantidades e quem atende. O plano de melhor valor ganha destaque sozinho.</p></figcaption>
+        </figure>
+        <figure>
+          <div class="viz" aria-hidden="true">
+            <div class="covered">
+              <div class="slots">
+                <span class="chip">09:30</span><span class="chip goldf">10:00</span><span class="chip goldf">10:30</span>
+                <span class="chip gone">14:00</span><span class="chip goldf">14:30</span><span class="chip">15:00</span>
+              </div>
+              <span class="free"><svg viewBox="0 0 24 24"><path d="M4 18h16l1-10-5 4-4-7-4 7-5-4Z"/></svg>Grátis no seu plano</span>
+            </div>
+          </div>
+          <figcaption><h3>O assinante sente a vantagem</h3><p>Os serviços do plano aparecem como grátis e os horários cobertos ficam em dourado.</p></figcaption>
+        </figure>
+        <figure>
+          <div class="viz" aria-hidden="true">
+            <div class="renew">
+              <p class="viz-head"><span>Para renovar</span><span class="mut">próximos 14 dias</span></p>
+              <ul>
+                <li><span>Bruno Lima</span><small>vence sexta</small><em>WhatsApp</em></li>
+                <li><span>Carla Dias</span><small>vence dia 3</small><em>WhatsApp</em></li>
+              </ul>
+            </div>
+          </div>
+          <figcaption><h3>Renovação sem esforço</h3><p>No cartão, renova sozinho todo mês. Para os outros, o app lista quem está vencendo para você chamar.</p></figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap divider" aria-hidden="true"></div>
+
+  <section id="equipe">
+    <div class="wrap split2 flip">
+      <div>
+        <h2>Sua equipe atende <em>pelo celular.</em></h2>
+        <p class="lede">Cada profissional vê a própria agenda, atende e encerra pelo app. A comissão de cada atendimento aparece na hora.</p>
+      </div>
+      <div class="viz" role="img" aria-label="Agenda de hoje do profissional: dois atendimentos concluídos, um em andamento às 14:30 e um a seguir às 16:00; ganhos de hoje R$ 186,00.">
+        <p class="viz-head"><span>Hoje</span><span class="mut">quinta, 26</span></p>
+        <ul class="agenda">
+          <li><span class="num">09:00</span><span>Ana · Corte</span><em class="done">atendido</em></li>
+          <li><span class="num">10:30</span><span>Bruno · Corte e barba</span><em class="done">atendido</em></li>
+          <li class="now"><span class="num">14:30</span><span>Lucas · Corte</span><em class="live"><i></i>em atendimento</em></li>
+          <li><span class="num">16:00</span><span>Marina · Barba</span><em>a seguir</em></li>
+        </ul>
+        <p class="viz-foot split-foot"><span class="mut">Seus ganhos hoje</span><b class="num">R$ 186,00</b></p>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap divider" aria-hidden="true"></div>
+
+  <section id="gestao">
+    <div class="wrap">
+      <div class="split2">
+        <div>
+          <h2>Os números do seu negócio, <em>sem planilha.</em></h2>
+          <p class="lede">Receita, ocupação, retenção e desempenho da equipe, sempre comparados com o período anterior. De uma unidade ou da rede inteira.</p>
+        </div>
+        <div class="viz" role="img" aria-label="Relatório de receita dos últimos 30 dias: R$ 14.832,00, 11% acima do período anterior, com barras diárias; 72% pago pelo app.">
+          <p class="viz-head"><span>Receita · 30 dias</span><span class="up">+11%</span></p>
+          <b class="big num">R$ 14.832,00</b>
+          <div class="bars" id="bars"></div>
+          <p class="legend"><span><i class="k-now"></i>Este período</span><span><i class="k-prev"></i>Período anterior</span></p>
+          <div class="paysplit"><i style="--w:52">Pix 52%</i><i style="--w:20">Cartão 20%</i><i style="--w:28">Balcão 28%</i></div>
+        </div>
+      </div>
+
+      <div class="camp">
+        <figure>
+          <div class="viz" aria-hidden="true">
+            <div class="heat" id="heat"></div>
+            <p class="legend"><span>Seg → Sáb</span><span>9h → 19h</span></p>
+          </div>
+          <figcaption><h3>Ocupação hora a hora</h3><p>Veja os horários vazios da semana e onde cabe mais um profissional.</p></figcaption>
+        </figure>
+        <figure>
+          <div class="viz" aria-hidden="true">
+            <div class="ret">
+              <b class="num">68%</b><small>dos clientes voltaram em até 30 dias</small>
+              <div class="retbar"><i style="--w:68%"></i></div>
+              <p class="legend"><span>31 novos</span><span>84 voltaram</span></p>
+            </div>
+          </div>
+          <figcaption><h3>Clientes que voltam</h3><p>Quem é novo, quem voltou e em quanto tempo.</p></figcaption>
+        </figure>
+        <figure>
+          <div class="viz" aria-hidden="true">
+            <ul class="pros">
+              <li><span>João</span><i style="--w:100%"></i><b class="num">R$ 92/h</b><em>★ 4,9</em></li>
+              <li><span>Ana</span><i style="--w:88%"></i><b class="num">R$ 81/h</b><em>★ 4,8</em></li>
+              <li><span>Rafael</span><i style="--w:80%"></i><b class="num">R$ 74/h</b><em>★ 4,6</em></li>
+            </ul>
+          </div>
+          <figcaption><h3>Desempenho da equipe</h3><p>Quanto cada profissional rende por hora, o tempo real de cada serviço e a nota dos clientes.</p></figcaption>
+        </figure>
+      </div>
+      <ul class="tags more-reports" aria-label="Outros relatórios">
+        <li>Faltas e cancelamentos</li><li>Assinantes e planos</li><li>Descontos e estornos</li><li>Exportação em planilha</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="wrap divider" aria-hidden="true"></div>
+
+  <section id="campanhas">
+    <div class="wrap">
+      <h2>Campanhas que trazem o cliente <em>de volta.</em></h2>
+      <p class="lede">O app encontra os clientes certos, manda a mensagem e mostra quanto ela rendeu.</p>
+      <div class="camp">
+        <figure>
+          <div class="viz" aria-hidden="true">
+            <ul class="recipes">
+              <li>Aniversário</li><li class="on">Plano acabando</li><li>Sumiu há 60 dias</li><li>Gastou bem no mês</li><li>Depois da 1ª visita</li>
+            </ul>
+          </div>
+          <figcaption><h3>Receitas prontas</h3><p>Escolha uma, ajuste o texto e deixe rodando sozinha.</p></figcaption>
+        </figure>
+        <figure>
+          <div class="viz" aria-hidden="true">
+            <div class="ab">
+              <div><span>A</span><i style="--w:48%"></i><b class="num">24%</b></div>
+              <div class="win"><span>B</span><i style="--w:72%"></i><b class="num">36%</b></div>
+              <small>A mensagem B vai para o restante do público</small>
+            </div>
+          </div>
+          <figcaption><h3>Teste A/B</h3><p>Duas versões da mensagem, e a melhor vai sozinha para todos.</p></figcaption>
+        </figure>
+        <figure>
+          <div class="viz" aria-hidden="true">
+            <div class="funnel">
+              <span style="--w:100%">Receberam <b class="num">1.000</b></span>
+              <span style="--w:84%">Abriram <b class="num">230</b></span>
+              <span style="--w:62%">Agendaram <b class="num">46</b></span>
+              <p class="num">R$ 2.070,00 <small>em atendimentos</small></p>
+            </div>
+          </div>
+          <figcaption><h3>Resultado em reais</h3><p>Um grupo de controle mostra o que veio só por causa da campanha.</p></figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap divider" aria-hidden="true"></div>
+
+  <section id="musica">
+    <div class="wrap split2">
+      <div>
+        <h2>A música do seu espaço, <em>no mesmo app.</em></h2>
+        <p class="lede">O gerente conecta uma conta de streaming. A equipe comanda o som diretamente pelo app, cada um em seu próprio celular.</p>
+      </div>
+      <div class="viz" role="img" aria-label="Tocando Águas de Março, de Elis Regina, pedida pelo cliente Lucas. Na fila, uma música escolhida pelo Rafael. Botão para abaixar o volume e conversar.">
+        <div class="np">
+          <span class="art"></span>
+          <div><b>Águas de Março</b><small class="mut">Elis Regina</small><span class="who">pedida pelo cliente Lucas</span></div>
+          <span class="eq"><i></i><i></i><i></i><i></i></span>
+        </div>
+        <div class="prog"><i></i></div>
+        <ul class="queue">
+          <li><span>Só Tinha de Ser Com Você</span><small>Rafael</small></li>
+          <li><span>Retrato em Branco e Preto</span><small>rádio da casa</small></li>
+        </ul>
+        <span class="talk">Abaixar para conversar</span>
+      </div>
+    </div>
+    <div class="wrap">
+      <div class="trio">
+        <div><h3>Gerente</h3><p>Conecta uma conta de streaming em poucos toques.</p></div>
+        <div><h3>Equipe</h3><p>Pausa, pula e põe música na fila pelo próprio celular.</p></div>
+        <div><h3>Cliente</h3><p>Quando faz uma reserva, o app pergunta se ele quer ouvir alguma música durante o atendimento. A música que o cliente escolheu entra automaticamente na fila assim que o atendimento é iniciado.</p></div>
+      </div>
+      <p class="aviso"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>Tocar música em ambiente comercial exige licença de execução pública do Ecad, que fica por conta do estabelecimento. A Prismo não fornece as músicas nem a licença.</p>
+    </div>
+  </section>
+
+  <div class="wrap divider" aria-hidden="true"></div>
+
+  <section id="avaliacoes">
+    <div class="wrap split2 flip">
+      <div>
+        <h2>Avaliações de quem <em>realmente foi atendido.</em></h2>
+        <p class="lede">Só avalia quem passou pelo atendimento no app, com o código lido no atendimento. Você responde, e todo mundo vê.</p>
+      </div>
+      <div class="viz" role="img" aria-label="Avaliação de 5 estrelas com selo de atendimento confirmado: Corte impecável, saí do jeito que pedi. Resposta do estabelecimento: Obrigado, até a próxima!">
+        <div class="rv">
+          <p class="viz-head"><span>Marina C.</span><span class="stars">★★★★★</span></p>
+          <span class="ok"><svg viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7"/></svg>Atendida em 26/11, corte com João</span>
+          <p class="quote">Corte impecável, saí do jeito que pedi.</p>
+          <div class="reply"><small>Resposta do Estúdio Alvorada</small>Obrigado, Marina! Até a próxima.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap divider" aria-hidden="true"></div>
+
+  <section id="mais">
+    <div class="wrap">
+      <h2>E mais o que <em>já vem no app.</em></h2>
+      <div class="more three">
+        <div><h3>Várias unidades</h3><p>Um app para a rede toda.</p></div>
+        <div><h3>Na tela de bloqueio</h3><p>O atendimento aparece na tela de bloqueio do cliente.</p></div>
+        <div><h3>Três idiomas</h3><p>Português, inglês e espanhol.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap divider" aria-hidden="true"></div>
+
+  <section id="comecar">
+    <div class="wrap">
+      <h2>Como <em>começa.</em></h2>
+      <ol class="steps start">
+        <li><div><b>Demonstração</b>Mostramos o app funcionando e montamos uma proposta para você.</div></li>
+        <li><div><b>Publicamos o seu app</b>Com a sua marca, na App Store e no Google Play.</div></li>
+        <li><div><b>Você cadastra o resto</b>Serviços, equipe e horários, pelo próprio app.</div></li>
+      </ol>
+    </div>
+  </section>
+
+  <div class="wrap divider" aria-hidden="true"></div>
+
+  <section id="perguntas">
+    <div class="wrap">
+      <h2>Perguntas <em>frequentes.</em></h2>
+      <div class="faq">
+        <details><summary>Já uso outro sistema de agendamento. Perco meus dados?</summary><p>Não. Peça a exportação dos dados ao seu sistema atual e nós fazemos a importação na Prismo. Tudo continua funcionando normalmente.</p></details>
+        <details><summary>Meu cliente precisa criar senha?</summary><p>Não precisa de senha nem e-mail, pois esses dados são fáceis de esquecer ou confundir. Ele entra com o número de WhatsApp e recebe o código de login por lá mesmo. Rápido e sem burocracia.</p></details>
+        <details><summary>Preciso de maquininha?</summary><p>Se você pretende receber os pagamentos diretamente através do app, não precisa, tudo é feito digitalmente. Para pagamentos físicos fora do app, você usa os meios de pagamento que já utiliza hoje, nada muda.</p></details>
+        <details><summary>Tenho mais de uma unidade. Funciona?</summary><p>Sim. Um único app funciona para toda a rede de estabelecimentos.</p></details>
+        <details><summary>Serve para o meu tipo de negócio?</summary><p>Serve para qualquer negócio que atende com hora marcada. O app ajusta o visual e a linguagem ao seu negócio: num salão, diz "a cabeleireira"; numa barbearia, "o barbeiro".</p></details>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap divider" aria-hidden="true"></div>
+
+  <section id="contato" class="cta">
+    <div class="wrap">
+      <h2>Quer ver o app <em>com a sua marca?</em></h2>
+      <p class="lede">Na demonstração, você vê o app funcionando e quanto custaria para o seu negócio.</p>
+      <a href="mailto:contato@prismo.studio?subject=Prismo%20Booking%3A%20quero%20uma%20demonstra%C3%A7%C3%A3o" class="btn btn-solid">contato@prismo.studio <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© <span id="year">2026</span> Prismo Studio · 69.411.284 RYAN RIBEIRO DE JESUS PIMENTEL · CNPJ 69.411.284/0001-05</span>
+    <span>Produtos digitais prontos, com a marca de quem usa.</span>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // QR ilustrativo: padrão fixo, não codifica nada.
+  (function () {
+    const n = 25, svg = document.getElementById('qr');
+    let seed = 7, out = '';
+    const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    const corners = [[0, 0], [n - 7, 0], [0, n - 7]];
+    const inFinder = (x, y) => corners.some(([fx, fy]) => x >= fx && x < fx + 7 && y >= fy && y < fy + 7);
+    const ring = (x, y) => corners.some(([fx, fy]) => {
+      const dx = x - fx, dy = y - fy;
+      if (dx < 0 || dy < 0 || dx > 6 || dy > 6) return false;
+      return dx === 0 || dy === 0 || dx === 6 || dy === 6 || (dx >= 2 && dx <= 4 && dy >= 2 && dy <= 4);
+    });
+    const gap = (x, y) => (x === 7 && y < 8) || (y === 7 && x < 8) || (x === n - 8 && y < 8) || (y === 7 && x > n - 9) || (x === 7 && y > n - 9) || (y === n - 8 && x < 8);
+    for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) {
+      const on = inFinder(x, y) ? ring(x, y) : gap(x, y) ? false : rnd() > .52;
+      if (on) out += `<rect x="${x}" y="${y}" width="1" height="1"/>`;
+    }
+    svg.innerHTML = `<g fill="#08080a">${out}</g>`;
+  })();
+
+  // Barras de receita ilustrativas: este período e o anterior.
+  (function () {
+    const now = [42, 55, 48, 70, 88, 96, 30, 50, 61, 58, 76, 92, 100, 34, 52, 64, 60, 80, 94, 98, 38];
+    const prev = [40, 46, 44, 60, 78, 84, 28, 45, 50, 52, 66, 80, 86, 30, 47, 55, 52, 70, 82, 88, 33];
+    document.getElementById('bars').innerHTML = now.map((h, i) => `<span style="--h:${h}%;--p:${Math.round(prev[i] / h * 100)}%"></span>`).join('');
+  })();
+
+  // Ocupação ilustrativa: seis dias, das 9h às 19h.
+  (function () {
+    const occ = [
+      [.2, .35, .5, .6, .3, .25, .4, .55, .6, .7, .5],
+      [.3, .45, .6, .7, .35, .3, .5, .6, .7, .8, .6],
+      [.25, .4, .55, .65, .4, .35, .55, .65, .75, .85, .7],
+      [.35, .5, .65, .75, .45, .4, .6, .7, .85, .95, .8],
+      [.45, .6, .75, .85, .55, .5, .7, .85, .95, 1, .95],
+      [.9, 1, 1, .95, .8, .7, .75, .8, .7, .55, .3]
+    ];
+    document.getElementById('heat').innerHTML = occ.flat().map(v => `<span style="background:color-mix(in srgb, #e8b23a ${Math.round(v * 100)}%, #1c1c20)"></span>`).join('');
+  })();
+</script>
+</body>
+</html>
