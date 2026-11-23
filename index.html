@@ -20,6 +20,7 @@
     --serif: "Fraunces", Georgia, serif;
     --sans: "Geist", system-ui, sans-serif;
     --wrap: min(1180px, 100% - 3rem);
+    --sec: clamp(4rem, 8vw, 6.5rem);
   }
   * { box-sizing: border-box; margin: 0; }
   html { scroll-behavior: smooth; scrollbar-color: #2a2a2e var(--bg); }
@@ -50,7 +51,7 @@
   .btn svg { width: 16px; height: 16px; }
 
   /* Hero */
-  .hero { position: relative; min-height: 92svh; display: grid; align-items: center; padding: 8rem 0 5rem; isolation: isolate; overflow: hidden; }
+  .hero { position: relative; min-height: 100svh; display: grid; align-items: center; padding: 6.5rem 0 7rem; isolation: isolate; overflow: hidden; }
   .beam { position: absolute; z-index: -1; top: 50%; left: 50%; width: 140vmax; height: 140vmax; translate: -30% -50%; background: conic-gradient(from 200deg at 50% 50%, transparent 0deg, #ff6b6b22 12deg, #ffb86b33 20deg, #f5e27a33 28deg, #7ee0a833 36deg, #6bc4ff33 44deg, #9a7bff33 52deg, transparent 64deg); filter: blur(40px); animation: drift 18s ease-in-out infinite alternate; }
   .hero::after { content: ""; position: absolute; inset: 0; z-index: -1; background: radial-gradient(ellipse at 20% 40%, transparent 30%, var(--bg) 75%); }
   @keyframes drift { to { rotate: 12deg; } }
@@ -59,7 +60,7 @@
   .actions { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 2.5rem; }
   .prism { position: absolute; right: max(1.5rem, calc((100vw - 1180px) / 2)); top: 50%; translate: 0 -50%; width: clamp(220px, 30vw, 420px); z-index: -1; opacity: .9; }
 
-  section { padding: clamp(5rem, 11vw, 8.5rem) 0; }
+  section { padding: var(--sec) 0; }
   .divider { height: 1px; background: var(--spectrum); opacity: .3; }
 
   /* Vitrine de produtos */
@@ -118,6 +119,8 @@
     html { scroll-behavior: auto; }
   }
 </style>
+<link rel="stylesheet" href="story.css">
+<script src="story.js" defer></script>
 </head>
 <body>
 
@@ -158,6 +161,7 @@
         <a href="#contato" class="btn">Fale conosco</a>
       </div>
     </div>
+    <a class="cue" href="#produtos"><span>Role para ver os produtos</span><i aria-hidden="true"></i></a>
   </section>
 
   <div class="wrap divider" aria-hidden="true"></div>
@@ -170,7 +174,7 @@
         <div>
           <p class="product-name"><svg aria-hidden="true"><use href="#i-mark"/></svg>Prismo Booking</p>
           <h3>O app de agendamento com o <em>nome do seu negócio.</em></h3>
-          <p class="lede">Seus clientes marcam, pagam e avaliam pelo app da sua marca. Para todo negócio que atende com hora marcada.</p>
+          <p class="lede">Seus clientes marcam e pagam pelo app da sua marca. Você vende assinaturas, chama de volta quem sumiu e acompanha o caixa. Para todo negócio que atende com hora marcada.</p>
           <ul class="tags">
             <li>Agenda e pagamento</li><li>Clube de assinatura</li><li>Relatórios</li><li>Campanhas</li><li>Música ambiente</li>
           </ul>

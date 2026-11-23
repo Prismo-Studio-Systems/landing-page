@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Prismo Booking — o app de agendamento com o nome do seu negócio</title>
-<meta name="description" content="Prismo Booking: o app de agendamento com o nome, o logo e as cores do seu negócio. Seus clientes marcam, pagam e avaliam; sua equipe atende pelo celular; você acompanha os números.">
+<meta name="description" content="Prismo Booking: o app de agendamento com o nome, o logo e as cores do seu negócio. Clube de assinatura, campanhas que trazem o cliente de volta e os números do caixa, num app só.">
 <meta name="theme-color" content="#08080a">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Geist:wght@300..600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Geist:wght@300..600&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #08080a;
@@ -20,6 +20,8 @@
     --serif: "Fraunces", Georgia, serif;
     --sans: "Geist", system-ui, sans-serif;
     --wrap: min(1180px, 100% - 3rem);
+    --sec: clamp(4rem, 8vw, 6.5rem);
+    --ease: cubic-bezier(.16, 1, .3, 1);
   }
   * { box-sizing: border-box; margin: 0; }
   html { scroll-behavior: smooth; scrollbar-color: #2a2a2e var(--bg); }
@@ -74,7 +76,7 @@
   .phone img { width: 100%; aspect-ratio: 390 / 844; border-radius: 37px; object-fit: cover; object-position: top; background: #000; }
 
   /* Hero */
-  .hero { position: relative; padding: 9rem 0 6rem; isolation: isolate; overflow: hidden; }
+  .hero { position: relative; min-height: 100svh; display: grid; align-items: center; padding: 6.5rem 0 7rem; isolation: isolate; overflow: hidden; }
   .beam {
     position: absolute; z-index: -1; top: 40%; left: 50%; width: 140vmax; height: 140vmax; translate: -30% -50%;
     background: conic-gradient(from 200deg at 50% 50%, transparent 0deg, #ff6b6b1c 12deg, #ffb86b2a 20deg, #f5e27a2a 28deg, #7ee0a82a 36deg, #6bc4ff2a 44deg, #9a7bff2a 52deg, transparent 64deg);
@@ -86,9 +88,13 @@
   .hero h1 { font-size: clamp(2.8rem, 6.4vw, 5.6rem); max-width: 13ch; }
   .hero .lede { font-size: 1.2rem; max-width: 32rem; }
   .actions { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 2.5rem; }
-  .hero .phone { justify-self: center; rotate: 2deg; width: 300px; }
+  .hero .phone { justify-self: center; rotate: 2deg; width: min(300px, calc((100svh - 14rem) * .46)); }
 
-  section { padding: clamp(5rem, 11vw, 8.5rem) 0; }
+  /* Ritmo: seções do mesmo capítulo ficam coladas (só o respiro de --sec);
+     a linha de espectro separa capítulos, com respiro dobrado. */
+  section { padding: var(--sec) 0; }
+  section + section { padding-top: 0; }
+  section + section[id] { scroll-margin-top: calc(4.5rem + var(--sec) * .6); }
   .divider { height: 1px; background: var(--spectrum); opacity: .3; }
   .split { display: grid; grid-template-columns: 1fr auto; gap: clamp(2rem, 6vw, 6rem); align-items: center; }
   .split.flip { grid-template-columns: auto 1fr; }
@@ -106,9 +112,41 @@
   .styles figure:nth-child(even) { margin-top: 3rem; }
   .styles figcaption { font-size: .92rem; color: var(--muted); }
   .styles figcaption b { display: block; font-family: var(--serif); font-weight: 400; font-size: 1.3rem; }
-  .editor { display: grid; grid-template-columns: auto 1fr; gap: clamp(2rem, 5vw, 4.5rem); align-items: center; margin-top: 6rem; padding: clamp(2rem, 5vw, 3.5rem); border-radius: 28px; border: 1px solid var(--line); background: radial-gradient(circle at 0% 0%, #9a7bff17, transparent 55%), var(--surface); position: relative; overflow: hidden; }
+  .editor { display: grid; grid-template-columns: auto minmax(0, 30rem); justify-content: center; gap: clamp(2rem, 7vw, 6rem); align-items: center; margin-top: 4.5rem; padding: clamp(2rem, 5vw, 3.5rem); border-radius: 28px; border: 1px solid var(--line); background: radial-gradient(circle at 0% 0%, #9a7bff17, transparent 55%), var(--surface); position: relative; overflow: hidden; }
   .editor::before { content: ""; position: absolute; inset: 0 0 auto; height: 1px; background: var(--spectrum); }
   .editor h3 { font-size: clamp(1.8rem, 3vw, 2.4rem); }
+
+  /* Editor ao vivo: a tela real do editor, com uma foto por sugestão de cor.
+     Tocar numa cor (aqui ou no celular) troca a foto na hora, como no app. */
+  @property --pick { syntax: "<color>"; inherits: true; initial-value: #4b6bd6; }
+  .editor { --pick: #4b6bd6; transition: --pick .7s var(--ease); }
+  .editor::after {
+    content: ""; position: absolute; z-index: 0; inset: 0; pointer-events: none;
+    background: radial-gradient(38% 55% at 24% 60%, color-mix(in srgb, var(--pick) 22%, transparent), transparent 72%);
+  }
+  .editor > * { position: relative; z-index: 1; }
+  .editor .phone { width: min(290px, calc((100svh - 17rem) * .46)); }
+  .preview .screen { position: relative; }
+  .preview .screen img + img { position: absolute; inset: 0; opacity: 0; transition: opacity .14s linear; }
+  .preview .screen img.on { opacity: 1; }
+  /* Os toques caem onde ficam as sugestões na tela (390 × 844). */
+  .preview .hit, .preview .tap { position: absolute; top: 88.27%; left: calc(var(--x) * 1%); width: 11%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; }
+  .preview .hit { z-index: 9; cursor: pointer; }
+  .preview .tap { z-index: 10; pointer-events: none; opacity: 0; background: #ffffff; }
+  .preview .tap.go { animation: tap .6s cubic-bezier(.2, .7, .3, 1) both; }
+  @keyframes tap { 0% { opacity: .5; scale: .35; } 25% { opacity: .38; scale: .8; } 100% { opacity: 0; scale: 1.7; } }
+  .picks-label { margin-top: 2rem; font-size: .85rem; color: var(--muted); }
+  .picks { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: .7rem; }
+  .pick {
+    width: 2.75rem; height: 2.75rem; border-radius: 50%; cursor: pointer;
+    border: 2px solid transparent; background: var(--c); background-clip: content-box; padding: 4px;
+    transition: border-color .25s, scale .25s var(--ease);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .pick:hover { scale: 1.08; }
+  .pick:active { scale: .92; }
+  .pick[aria-pressed="true"] { border-color: var(--text); }
+  .editor h3 em { color: color-mix(in oklab, var(--pick) 62%, var(--text)); }
 
   /* Fluxo */
   .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; margin-top: 4rem; }
@@ -141,12 +179,6 @@
   .music p { color: var(--muted); font-size: .97rem; }
   .lands { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 4rem; }
 
-  .steps { list-style: none; padding: 0; counter-reset: s; display: grid; gap: 1.5rem; align-content: center; }
-  .steps.start { grid-template-columns: repeat(3, 1fr); gap: 2.5rem; margin-top: 3rem; }
-  .steps.start li { border-top: 1px solid var(--line); padding-top: 1.4rem; }
-  .steps li { counter-increment: s; display: grid; grid-template-columns: 2.2rem 1fr; gap: .5rem; color: var(--muted); font-size: .95rem; }
-  .steps li::before { content: counter(s); font: italic 400 1.4rem/1 var(--serif); color: var(--text); }
-  .steps b { display: block; margin-bottom: .2rem; }
 
   .faq { margin-top: 3rem; max-width: 50rem; }
   .faq details { border-top: 1px solid var(--line); }
@@ -160,6 +192,9 @@
   .cta { text-align: center; }
   .cta h2 { font-size: clamp(2.4rem, 6vw, 4.8rem); max-width: 16ch; margin: 0 auto; }
   .cta .lede { margin: 1.4rem auto 2.5rem; }
+  .cta .mail { margin-top: 1.1rem; font-size: .9rem; color: var(--muted); }
+  .cta .mail a { color: var(--text); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: #ffffff55; }
+  .cta .mail a:hover { text-decoration-color: currentColor; }
 
   footer { border-top: 1px solid var(--line); padding: 2.5rem 0; color: var(--muted); font-size: .85rem; }
   footer .wrap { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
@@ -177,6 +212,11 @@
   @media (max-width: 900px) {
     nav ul { display: none; }
     .hero-grid, .split, .split.flip, .price-box, .editor { grid-template-columns: minmax(0, 1fr); }
+    /* Celular: o texto ocupa a primeira tela inteira, com o aviso de rolar no pé; o celular vem logo abaixo. */
+    .hero { display: block; padding: 0 0 4rem; }
+    .hero-grid { gap: 0; }
+    .hero-grid > div:first-child { min-height: 100svh; display: flex; flex-direction: column; justify-content: center; padding: 5.5rem 0 6.5rem; }
+    .hero .phone { width: min(280px, 76vw); margin-top: 3rem; }
     .split.flip > .phones, .split.flip > .phone { order: 0; }
     .split > .phone, .split > .phones, .editor .phone { justify-self: center; }
   }
@@ -196,12 +236,15 @@
     .flow.three .phone { width: 70%; }
     .phone.land { padding: 6px; border-radius: 26px; }
     .phone.land img { border-radius: 21px; }
-    .steps.start { grid-template-columns: 1fr; gap: 1.5rem; }
     header .btn { display: none; }
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
     html { scroll-behavior: auto; }
+    /* O fluxo do atendimento ainda acontece passo a passo, só que sem movimento: as cores trocam. */
+    .steps4 .chip.on, .steps4 .pair .yes, .steps4 .ring, .steps4 .paid b, .steps4 .paid small {
+      transition: background-color .2s, border-color .2s, color .2s, opacity .2s !important;
+    }
   }
 </style>
 <style>
@@ -242,7 +285,7 @@
   .pair .yes { background: var(--text); color: var(--bg); border-color: var(--text); font-weight: 500; }
   .paid { display: grid; justify-items: center; gap: .35rem; }
   .ring { width: 4.2rem; height: 4.2rem; border-radius: 50%; display: grid; place-items: center; border: 1px solid #30d15866; background: #30d15814; margin-bottom: .5rem; }
-  .ring svg, .ok svg { width: 1.8rem; fill: none; stroke: #30d158; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  .ring svg { width: 1.8rem; fill: none; stroke: #30d158; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
   .paid b { font-size: 1.35rem; }
   .paid small { color: var(--muted); font-size: .82rem; }
 
@@ -255,7 +298,6 @@
   .stack span { padding: .55rem .7rem; border-radius: 8px; background: #ffffff10; border: 1px solid #ffffff14; font-size: .8rem; color: #d6d4cf; }
   .stack .gold { height: 6.6rem; display: grid; align-items: end; background: linear-gradient(160deg, #f2cf74, #c9902a); color: #2b1d00; font-weight: 600; border: 0; }
   .stack .save { border: 1px dashed #e8b23a99; background: transparent; color: #e8b23a; text-align: center; font-family: "Geist Mono", monospace; height: 5.8rem; display: grid; place-items: center; }
-  .gold-t { color: #e8b23a; font-weight: 500; }
 
   /* Agenda do barbeiro */
   .agenda { list-style: none; padding: 0; margin-top: 1rem; display: grid; }
@@ -279,56 +321,48 @@
   .k-now { background: #e8b23a; } .k-prev { border-top: 2px solid #ffffff77; height: 0 !important; vertical-align: 3px !important; }
 
   /* Campanhas */
-  .camp { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-top: 3.5rem; }
-  .camp figure { display: grid; gap: 1.25rem; align-content: start; }
-  .camp .viz { height: 16rem; display: grid; align-content: center; }
+  /* Linha de três: o subgrid alinha as legendas mesmo quando um cartão cresce. */
+  .camp { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: auto auto; gap: 0 1.25rem; margin-top: 3.5rem; }
+  .camp figure { display: grid; grid-row: span 2; grid-template-rows: subgrid; gap: 1.25rem; }
+  .camp .viz { min-height: 16rem; display: grid; align-content: center; }
   .camp h3 { font-size: 1.4rem; margin-bottom: .3rem; }
   .camp figcaption p { color: var(--muted); font-size: .95rem; }
   .recipes { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: .5rem; }
   .recipes li { padding: .5rem .9rem; border-radius: 999px; border: 1px solid #ffffff22; font-size: .85rem; color: #d6d4cf; }
   .recipes .on { background: var(--text); color: var(--bg); border-color: var(--text); font-weight: 500; }
-  .ab { display: grid; gap: .9rem; }
-  .ab div { display: grid; grid-template-columns: 1.4rem 1fr 3rem; gap: .7rem; align-items: center; }
-  .ab span { font: 500 .85rem var(--sans); color: var(--muted); }
-  .ab i { height: .9rem; border-radius: 999px; background: linear-gradient(90deg, #ffffff40 var(--w), #ffffff0d var(--w)); }
-  .ab .win i { background: linear-gradient(90deg, #e8b23a var(--w), #ffffff0d var(--w)); }
-  .ab .win b { color: #e8b23a; }
-  .ab b { font-size: .9rem; text-align: right; }
-  .ab small { color: var(--muted); font-size: .8rem; margin-top: .3rem; }
-  .funnel { display: grid; gap: 5px; justify-items: center; }
-  .funnel span { width: var(--w); display: flex; justify-content: space-between; padding: .55rem .85rem; border-radius: 8px; font-size: .82rem; background: linear-gradient(90deg, #ffffff14, #ffffff08); }
-  .funnel span:nth-child(3) { background: linear-gradient(90deg, #e8b23a40, #e8b23a1a); }
-  .funnel p { margin-top: .8rem; font-size: 1.15rem; color: #30d158; }
-  .funnel p small { font: 400 .8rem var(--sans); color: var(--muted); margin-left: .3rem; }
+
+  /* Campanha: quem recebe → a mensagem → o que voltou em reais. */
+  .send { display: grid; gap: 1.35rem; }
+  .send .viz-head { margin-bottom: .8rem; }
+  .note {
+    display: grid; grid-template-columns: 2.4rem 1fr; gap: .8rem; align-items: start;
+    padding: .9rem 1rem; border-radius: 18px; background: #ffffff0c; border: 1px solid #ffffff14;
+    box-shadow: 0 18px 36px -22px #000;
+  }
+  .note-ic { width: 2.4rem; height: 2.4rem; border-radius: 10px; display: grid; place-items: center; background: linear-gradient(160deg, #e2c27c, #b48a3a); color: #2b1d00; font: 600 .78rem var(--sans); letter-spacing: .02em; }
+  .note small { display: block; color: var(--muted); font-size: .75rem; }
+  .note b { display: block; font-weight: 500; font-size: .95rem; margin-top: .1rem; }
+  .note span:last-child { display: block; color: #d6d4cf; font-size: .85rem; line-height: 1.45; }
+  .reach { padding-top: 1.2rem; border-top: 1px solid var(--line); }
+  .reach-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; }
+  .reach-row span { display: grid; gap: .1rem; padding: .6rem .75rem; border-radius: 10px; background: #ffffff0a; font-size: .78rem; color: var(--muted); }
+  .reach-row b { font-size: 1.1rem; color: var(--text); }
+  .reach-row span:last-child { background: color-mix(in srgb, var(--hue) 16%, transparent); }
+  .gain { margin-top: 1rem; display: flex; align-items: baseline; gap: .5rem; flex-wrap: wrap; color: var(--muted); font-size: .9rem; }
+  .gain b { font-size: 2rem; letter-spacing: -.02em; color: #30d158; }
+
+  /* Clube: a receita que entra todo mês. */
+  .mrr { display: grid; grid-template-columns: repeat(6, 1fr); gap: .5rem; align-items: end; height: 8.5rem; margin-top: 1.4rem; }
+  .mrr span { height: var(--h); border-radius: 4px 4px 0 0; background: linear-gradient(#e8b23a, #b07a00); opacity: .55; }
+  .mrr span:last-child { opacity: 1; }
+  .mrr-x { display: grid; grid-template-columns: repeat(6, 1fr); gap: .5rem; margin-top: .5rem; font-size: .75rem; color: var(--muted); text-align: center; }
 
   /* Música */
-  .np { display: grid; grid-template-columns: 4rem 1fr auto; gap: 1rem; align-items: center; }
-  .art { width: 4rem; height: 4rem; border-radius: 12px; background: radial-gradient(circle at 30% 30%, #ffb86b, #ff6b6b 45%, #6b2a3a 90%); box-shadow: 0 10px 24px -10px #ff6b6b88; }
-  .np b { display: block; font-weight: 500; font-size: 1.05rem; }
-  .np small { display: block; font-size: .85rem; }
-  .who { display: inline-block; margin-top: .35rem; font-size: .75rem; padding: .2rem .55rem; border-radius: 999px; background: #ff8a6b1f; color: #ffb39c; }
-  .eq { display: flex; gap: 3px; align-items: flex-end; height: 1.4rem; }
-  .eq i { width: 4px; height: 100%; border-radius: 2px; background: #ff8a6b; transform-origin: bottom; animation: eq 1.1s ease-in-out infinite; }
-  .eq i:nth-child(2) { animation-delay: -.4s; } .eq i:nth-child(3) { animation-delay: -.8s; } .eq i:nth-child(4) { animation-delay: -.2s; }
   @keyframes eq { 0%, 100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
-  .prog { height: 3px; border-radius: 2px; background: #ffffff14; margin: 1.3rem 0 .4rem; overflow: hidden; }
-  .prog i { display: block; width: 42%; height: 100%; background: #ff8a6b; }
-  .queue { list-style: none; padding: 0; margin-top: 1rem; }
-  .queue li { display: flex; justify-content: space-between; gap: 1rem; padding: .7rem 0; border-top: 1px solid var(--line); font-size: .9rem; }
-  .queue small { color: var(--muted); }
-  .talk { display: inline-block; margin-top: 1.1rem; padding: .6rem 1rem; border-radius: 999px; border: 1px solid #ffffff22; font-size: .85rem; }
   .trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.5rem; margin-top: 4rem; }
   .trio div { border-top: 1px solid var(--line); padding-top: 1.3rem; }
   .trio h3 { font-size: 1.4rem; margin-bottom: .4rem; }
   .trio p { color: var(--muted); font-size: .95rem; }
-
-  /* Avaliação */
-  .stars { color: #ffd60a; letter-spacing: .12em; }
-  .ok { display: inline-flex; align-items: center; gap: .45rem; margin-top: .8rem; font-size: .8rem; color: #8fe3a5; padding: .3rem .7rem .3rem .5rem; border-radius: 999px; background: #30d15814; }
-  .ok svg { width: 1rem; }
-  .quote { margin-top: 1rem; font: 300 1.25rem/1.4 var(--serif); }
-  .rv .reply { margin-top: 1.2rem; padding: .9rem 1rem; border-radius: 14px; background: #ffffff08; font-size: .9rem; color: var(--muted); }
-  .rv .reply small { display: block; color: var(--text); font-size: .78rem; font-weight: 500; margin-bottom: .2rem; }
 
   /* Planos: detalhes */
   .plans-mini { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; align-items: end; }
@@ -338,10 +372,6 @@
   .plans-mini small { color: var(--muted); font-size: .75rem; }
   .plans-mini .best { border-color: #e8b23a; background: #e8b23a12; }
   .plans-mini em { justify-self: start; font-style: normal; font-size: .68rem; font-weight: 600; padding: .15rem .5rem; border-radius: 999px; background: #e8b23a; color: #2b1d00; margin-bottom: .3rem; }
-  .covered { display: grid; gap: 1rem; }
-  .chip.goldf { border-color: #e8b23a; color: #f2cf74; background: #e8b23a12; }
-  .free { justify-self: start; display: inline-flex; align-items: center; gap: .4rem; font-size: .82rem; color: #f2cf74; }
-  .free svg { width: 1rem; fill: #e8b23a; }
   .renew ul { list-style: none; padding: 0; margin-top: .8rem; }
   .renew li { display: grid; grid-template-columns: 1fr auto; gap: .1rem .8rem; padding: .7rem 0; border-top: 1px solid var(--line); font-size: .9rem; }
   .renew small { grid-column: 1; color: var(--muted); font-size: .78rem; }
@@ -365,13 +395,446 @@
   .aviso { display: flex; gap: .6rem; align-items: flex-start; margin-top: 2.5rem; max-width: 46rem; font-size: .85rem; color: var(--muted); }
   .aviso svg { width: 1.05rem; flex: none; margin-top: .15rem; fill: none; stroke: var(--muted); stroke-width: 1.8; stroke-linecap: round; }
 
+  /* O balcão e a equipe: cada recurso com um pedaço da tela do app desenhado. */
+  .feats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; margin-top: 3rem; }
+  .feat {
+    position: relative; isolation: isolate; overflow: hidden; margin: 0;
+    display: grid; grid-template-rows: 1fr auto; gap: 1.4rem;
+    padding: 1.35rem 1.35rem 1.5rem; border-radius: 24px; border: 1px solid var(--line);
+    background:
+      radial-gradient(90% 70% at 100% 0%, color-mix(in srgb, var(--hue) 10%, transparent), transparent 70%),
+      linear-gradient(180deg, #ffffff05, transparent 45%), var(--surface);
+  }
+  .feat::before { content: ""; position: absolute; inset: 0 22px auto; height: 1px; background: linear-gradient(90deg, transparent, var(--hue) 30%, var(--hue) 70%, transparent); opacity: .5; }
+  .feat.wide { grid-column: span 2; }
+  .feat.tall { grid-column: span 2; grid-row: span 2; }
+  .feat h3 { font-size: 1.3rem; margin-bottom: .35rem; }
+  .feat figcaption p { color: var(--muted); font-size: .92rem; max-width: 36ch; }
+  .mini { align-self: center; font-size: .82rem; color: #d6d4cf; list-style: none; padding: 0; margin: 0; }
+  .mini b { font-weight: 500; color: var(--text); }
+  .mini small { display: block; color: var(--muted); font-size: .72rem; }
+  .mini ul { list-style: none; padding: 0; margin: 0; }
+  /* Um pedaço de tela: painel escuro que flutua sobre o cartão. */
+  .att, .day, .toast, .book, .clients, .owe, .hire, .comm, .views, .log, .days {
+    padding: .9rem 1rem; border-radius: 16px; background: #0b0b0e; border: 1px solid #ffffff12;
+    box-shadow: 0 14px 30px -18px #000, inset 0 1px 0 #ffffff08;
+  }
+
+  .cal { align-self: stretch; display: grid; grid-template-rows: auto 1fr; padding: .9rem 1rem 1rem; border-radius: 18px; background: #0b0b0e; border: 1px solid #ffffff12; box-shadow: 0 18px 40px -22px #000, inset 0 1px 0 #ffffff08; }
+  .cal-head, .cal-grid { display: grid; grid-template-columns: 2rem repeat(3, minmax(0, 1fr)); gap: 0 .4rem; }
+  .cal-head { padding-bottom: .6rem; border-bottom: 1px solid var(--line); font-size: .78rem; }
+  .cal-grid { position: relative; grid-template-rows: repeat(12, minmax(1.45rem, 1fr)); padding-top: .5rem; }
+  .cal-hours { grid-column: 1; grid-row: 1 / -1; display: grid; grid-template-rows: subgrid; }
+  .cal-hours span { grid-row: span 2; font: 400 .66rem "Geist Mono", monospace; color: #8a8780; }
+  .cal-col { grid-row: 1 / -1; display: grid; grid-template-rows: subgrid; border-left: 1px dashed #ffffff0d; padding-left: .4rem; }
+  .blk {
+    grid-row: var(--r0) / span var(--rn); margin: 2px 0; padding: .3rem .45rem; border-radius: 7px;
+    font: normal 500 .68rem/1.2 var(--sans); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    background: #ffffff0d; color: #b9b6b0;
+  }
+  .blk.done { background: #30d15817; color: #a9c9b1; }
+  .blk.now { background: color-mix(in srgb, var(--hue) 34%, transparent); color: var(--text); }
+  .blk.next { background: #ffffff14; color: var(--text); }
+  .blk.free { background: transparent; border: 1px dashed #ffffff2a; color: #8a8780; font-weight: 400; }
+  .cal-now {
+    position: absolute; left: 2rem; right: 0; top: calc(.5rem + (100% - .5rem) * var(--at) / 12); height: 0;
+    border-top: 1px solid var(--hue); pointer-events: none;
+  }
+  .cal-now::before { content: ""; position: absolute; left: -4px; top: -4.5px; width: 8px; height: 8px; border-radius: 50%; background: var(--hue); box-shadow: 0 0 0 4px color-mix(in srgb, var(--hue) 22%, transparent); }
+
+  .mini-head { display: flex; align-items: center; gap: .5rem; margin-bottom: .75rem; font-size: .78rem; color: var(--muted); }
+  .mini-head i { width: 6px; height: 6px; border-radius: 50%; background: var(--hue); }
+  .att-row, .day-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem; }
+  .att-row span, .day-row span { display: grid; gap: .15rem; padding: .7rem .8rem; border-radius: 12px; background: #ffffff08; color: var(--muted); font-size: .74rem; }
+  .att-row span:first-child { background: color-mix(in srgb, var(--hue) 14%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hue) 45%, transparent); }
+  .att-row b, .day-row b { font-size: 1.35rem; letter-spacing: -.01em; }
+  .day-row span { background: transparent; padding: 0; }
+  .day-money { display: grid; grid-template-columns: 1fr 1fr; gap: .2rem 1rem; margin-top: .9rem; padding-top: .8rem; border-top: 1px solid var(--line); font-size: .74rem; color: var(--muted); }
+  .day-money b { display: block; font-size: 1rem; margin-top: .1rem; }
+  .day-money span:nth-child(2) { text-align: right; }
+  .day-money i { grid-column: 1 / -1; height: 6px; margin-top: .5rem; border-radius: 999px; background: linear-gradient(90deg, #30d158 var(--w), #ffffff12 var(--w)); }
+
+  .toast { display: grid; grid-template-columns: 2.2rem 1fr; gap: .75rem; align-items: center; }
+  .tick { width: 2.2rem; height: 2.2rem; border-radius: 50%; display: grid; place-items: center; background: #30d1581f; box-shadow: inset 0 0 0 1px #30d15855; }
+  .tick svg { width: 1.1rem; fill: none; stroke: #30d158; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+  .toast b { font-size: .88rem; }
+
+  .book { display: grid; gap: .3rem; }
+  .book-who { display: flex; align-items: center; gap: .45rem; color: var(--muted); font-size: .74rem; }
+  .book-who svg { width: .95rem; fill: none; stroke: var(--tint); stroke-width: 1.8; stroke-linejoin: round; }
+  .book b { font-size: .95rem; }
+  .book em { justify-self: start; margin-top: .25rem; font-style: normal; font-size: .7rem; padding: .25rem .6rem; border-radius: 999px; background: #ffd60a14; color: #f3d870; }
+
+  .sorts { display: flex; gap: .35rem; margin-bottom: .55rem; }
+  .sorts span { padding: .2rem .55rem; border-radius: 999px; border: 1px solid #ffffff1c; font-size: .68rem; color: var(--muted); }
+  .sorts .on { background: color-mix(in srgb, var(--hue) 18%, transparent); border-color: color-mix(in srgb, var(--hue) 55%, transparent); color: var(--tint); }
+  .clients li, .owe li { display: flex; justify-content: space-between; align-items: baseline; gap: .6rem; padding: .55rem 0 .45rem; }
+  .clients li, .owe li + li { border-top: 1px solid var(--line); }
+  .clients li:first-child b { color: var(--tint); }
+  .owe li:first-child { padding-top: 0; }
+  .owe li b { color: #ffd60a; }
+  .owe-btn { display: block; margin-top: .6rem; padding: .42rem; text-align: center; border-radius: 999px; border: 1px solid #ffffff24; font-size: .72rem; color: var(--text); }
+
+  .hire { display: grid; grid-template-columns: 2.4rem 1fr; gap: .2rem .7rem; align-items: center; }
+  .av { grid-row: span 2; width: 2.4rem; height: 2.4rem; border-radius: 50%; display: grid; place-items: center; font: 600 .74rem var(--sans); color: #2a1208; background: linear-gradient(160deg, #ffc2ad, var(--hue)); }
+  .hire em { grid-column: 2; justify-self: start; font-style: normal; font-size: .68rem; padding: .2rem .55rem; border-radius: 999px; background: #30d1581a; color: #8fe3a5; }
+
+  .comm { display: grid; gap: .7rem; }
+  .comm div { display: grid; grid-template-columns: 3.2rem 1fr 2.4rem; gap: .5rem; align-items: center; }
+  .comm span { font-size: .74rem; color: var(--muted); }
+  .comm i { height: .5rem; border-radius: 999px; background: linear-gradient(90deg, #ffffff40 var(--w), #ffffff0d var(--w)); }
+  .comm .hl i { background: linear-gradient(90deg, var(--hue) var(--w), #ffffff0d var(--w)); }
+  .comm .hl b, .comm .hl span { color: var(--tint); }
+  .comm b { text-align: right; }
+
+  .strip { display: grid; grid-template-columns: repeat(14, minmax(0, 1fr)); gap: 4px; }
+  .strip span { display: grid; justify-items: center; gap: .05rem; padding: .4rem 0 .45rem; border-radius: 8px; background: #ffffff08; font: 500 .8rem "Geist Mono", monospace; color: #d6d4cf; }
+  .strip small { font: 400 .58rem var(--sans); }
+  .strip .hol { background: color-mix(in srgb, var(--hue) 26%, transparent); color: var(--text); box-shadow: inset 0 0 0 1px var(--hue); }
+  .strip .off { background: color-mix(in srgb, var(--hue) 9%, transparent); outline: 1px dashed color-mix(in srgb, var(--hue) 70%, transparent); outline-offset: -1px; }
+  .strip .shut { background: transparent; color: #7d7a74; }
+  .strip .shut small { color: #7d7a74; }
+  .keys { display: flex; flex-wrap: wrap; gap: .4rem 1rem; margin-top: .7rem; font-size: .7rem; color: var(--muted); }
+  .keys span::before { content: ""; display: inline-block; width: .6rem; height: .6rem; margin-right: .35rem; border-radius: 3px; vertical-align: -1px; }
+  .k-hol::before { background: color-mix(in srgb, var(--hue) 40%, transparent); box-shadow: inset 0 0 0 1px var(--hue); }
+  .k-off::before { outline: 1px dashed var(--hue); outline-offset: -1px; }
+  .k-shut::before { box-shadow: inset 0 0 0 1px #ffffff2a; }
+
+  .views { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem; }
+  .views span { padding: .75rem .8rem; border-radius: 12px; border: 1px solid #ffffff14; }
+  .views b { display: block; font-size: .85rem; }
+  .views .on { background: color-mix(in srgb, var(--hue) 16%, transparent); border-color: color-mix(in srgb, var(--hue) 60%, transparent); }
+  .views .on b { color: var(--tint); }
+
+  .log li { display: grid; grid-template-columns: 2.8rem 3rem 1fr; gap: .6rem; align-items: baseline; padding: .65rem 0 .55rem; }
+  .log li + li { border-top: 1px solid var(--line); }
+  .log li:first-child { padding-top: 0; }
+  .log li:last-child { padding-bottom: 0; }
+  .log time { font-size: .72rem; color: var(--muted); }
+  .log span { color: #b9b6b0; min-width: 0; }
+
+  /* Música: o player do app ("Tocando agora"), desenhado num celular deitado.
+     Tudo dentro mede em cqi (largura do aparelho), como uma tela de verdade
+     encolhida; num aparelho estreito, o player fica em pé, como no app. */
+  .music-split { grid-template-columns: minmax(0, 23rem) minmax(0, 1fr); gap: clamp(2rem, 5vw, 4.5rem); }
+  .music-split h2 { font-size: clamp(2.2rem, 3.8vw, 3.1rem); }
+  .mplayer {
+    container: mp / inline-size; width: 100%; max-width: 860px; justify-self: center;
+    padding: 9px; border-radius: 42px;
+    background: linear-gradient(160deg, #2c2c31, #111114 40%, #1d1d21);
+    box-shadow: 0 40px 80px -30px #000, inset 0 0 0 1px #ffffff14;
+  }
+  .mp-screen {
+    position: relative; overflow: hidden; aspect-ratio: 844 / 390; border-radius: 4cqi;
+    display: grid; grid-template-columns: 39.5cqi minmax(0, 1fr); column-gap: 3.2cqi; align-items: center;
+    padding: 2.4cqi 7cqi 2.4cqi 8.2cqi; color: #f6f1ee; font-family: var(--sans); font-weight: 400;
+    /* a tela é acesa pela capa que toca */
+    background:
+      radial-gradient(46cqi 26cqi at 27% 0%, #ff8a6b5e, transparent 80%),
+      radial-gradient(46cqi 22cqi at 27% 100%, #ff6b4a4a, transparent 80%),
+      radial-gradient(90cqi 60cqi at 30% 50%, #ff8a6b1f, transparent 75%),
+      #0f0b0b;
+  }
+  .mp-screen button { font: inherit; color: inherit; -webkit-tap-highlight-color: transparent; }
+  .mp-cover { aspect-ratio: 1; border-radius: 3.2cqi; overflow: hidden; box-shadow: 0 2.6cqi 0 -.6cqi #00000075, 0 3cqi 6cqi -2cqi #000; }
+  .mp-cover svg { display: block; width: 100%; height: 100%; }
+  .mp-side { display: grid; align-content: center; min-width: 0; }
+  .mp-top { display: flex; align-items: center; justify-content: space-between; gap: 1.6cqi; margin-bottom: 2.4cqi; }
+  .mp-ic { width: 4.8cqi; height: 4.8cqi; padding: 0; border: 0; border-radius: 50%; display: grid; place-items: center; background: none; color: #f6f1ee; flex: none; }
+  .mp-ic svg { width: 3cqi; height: 3cqi; }
+  button.mp-ic { cursor: pointer; transition: background-color .2s, color .2s, scale .2s var(--ease); }
+  button.mp-ic:hover { background: #ffffff14; }
+  button.mp-ic:active, .mp-play:active { scale: .92; }
+  .mp-now { display: inline-flex; align-items: center; gap: 1cqi; font-size: 1.35cqi; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: #d9cfcb; white-space: nowrap; }
+  .mp-eq { display: inline-flex; align-items: flex-end; gap: .35cqi; height: 1.6cqi; }
+  .mp-eq i { width: .45cqi; height: 100%; border-radius: 1px; background: var(--hue); transform-origin: bottom; animation: eq 1.1s ease-in-out infinite; }
+  .mp-eq i:nth-child(2) { animation-delay: -.45s; } .mp-eq i:nth-child(3) { animation-delay: -.8s; }
+  .mplayer.stopped .mp-eq i { animation-play-state: paused; }
+  .mp-chip { display: inline-flex; align-items: center; gap: .8cqi; padding: 1cqi 1.8cqi; border-radius: 999px; border: 1px solid #ffffff38; background: #ffffff08; font-size: 1.65cqi !important; font-weight: 600 !important; cursor: pointer; white-space: nowrap; transition: background-color .2s; }
+  .mp-chip:hover { background: #ffffff14; }
+  .mp-chip svg { width: 2.4cqi; height: 2.4cqi; }
+  .mp-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 2cqi; }
+  .mp-meta { display: grid; gap: .55cqi; justify-items: start; min-width: 0; }
+  .mp-meta > * { max-width: 100%; }
+  .mp-title { font-size: 3.5cqi; font-weight: 700; line-height: 1.12; letter-spacing: -.015em; color: #fff; margin-bottom: .35cqi; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mp-artist, .mp-album, .mp-by { display: inline-flex; align-items: center; gap: .8cqi; white-space: nowrap; }
+  .mp-artist { font-size: 1.95cqi; font-weight: 600; color: #fff; }
+  .mp-album { font-size: 1.7cqi; color: #cfc6c2; }
+  .mp-artist svg, .mp-album svg { width: 2cqi; height: 2cqi; flex: none; }
+  .mp-artist .mp-go, .mp-album .mp-go { width: 1.7cqi; height: 1.7cqi; margin-left: -.3cqi; opacity: .85; }
+  .mp-by { font-size: 1.5cqi; color: #cfc6c2; }
+  .mp-face { width: 2.7cqi; height: 2.7cqi; border-radius: 50%; display: grid; place-items: center; font: normal 600 .95cqi var(--sans); background: #2a2224; color: #fff; box-shadow: inset 0 0 0 1px #ffffff26; flex: none; }
+  .mp-tag { font-style: normal; font-size: 1.3cqi; padding: .35cqi 1.1cqi; border-radius: 999px; background: color-mix(in srgb, var(--hue) 20%, transparent); color: var(--tint); }
+  .mp-tag[hidden] { display: none; }
+  .mp-fav svg { width: 3.2cqi; height: 3.2cqi; fill: none; transition: fill .2s, scale .3s var(--ease); }
+  .mp-fav[aria-pressed="true"] { color: var(--hue); }
+  .mp-fav[aria-pressed="true"] svg { fill: currentColor; scale: 1.08; }
+  .mp-prog { display: grid; grid-template-columns: 1fr auto; row-gap: .9cqi; margin-top: 2.4cqi; font-size: 1.45cqi; font-weight: 600; color: #d9cfcb; font-variant-numeric: tabular-nums; }
+  .mp-bar { grid-column: 1 / -1; height: .6cqi; border-radius: 999px; background: #ffffff2e; overflow: hidden; }
+  .mp-bar i { display: block; height: 100%; width: var(--p, 35%); border-radius: inherit; background: linear-gradient(90deg, #ffe4da, #ffc2b1); }
+  .mp-left { text-align: right; }
+  .mp-ctrl { display: flex; align-items: center; justify-content: center; gap: 6.5cqi; margin-top: .2cqi; }
+  .mp-ctrl .mp-ic { width: 6.2cqi; height: 6.2cqi; }
+  .mp-ctrl .mp-ic svg { width: 3.4cqi; height: 3.4cqi; }
+  .mp-play {
+    width: 7.2cqi; height: 7.2cqi; border: 0; border-radius: 50%; display: grid; place-items: center; cursor: pointer;
+    background: var(--hue); color: #2a1208 !important; box-shadow: 0 1cqi 2.4cqi -1cqi #000c;
+    transition: scale .2s var(--ease), background-color .2s;
+  }
+  .mp-play:hover { background: color-mix(in srgb, var(--hue) 88%, #fff); }
+  .mp-play svg { width: 3.2cqi; height: 3.2cqi; }
+  .mp-out { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 1.4cqi; margin-top: 1.4cqi; }
+  .mp-speaker { width: 5.2cqi; height: 5.2cqi; border-radius: 50%; display: grid; place-items: center; font-size: 1.35cqi; font-weight: 600; background: #2a2224; box-shadow: 0 0 0 .3cqi #0f0b0b, 0 0 0 .6cqi var(--hue); }
+  .mp-vol { position: relative; display: block; height: 5cqi; }
+  .mp-vol svg { position: absolute; z-index: 1; left: 2cqi; top: 50%; translate: 0 -50%; width: 2.4cqi; height: 2.4cqi; color: #1d1615; pointer-events: none; }
+  .mp-vol input {
+    -webkit-appearance: none; appearance: none; display: block; width: 100%; height: 100%; margin: 0; border-radius: 999px; cursor: pointer;
+    background: linear-gradient(90deg, #ecebe8 var(--v, 58%), #ffffff1f var(--v, 58%));
+  }
+  .mp-vol input::-webkit-slider-thumb { -webkit-appearance: none; width: 1px; height: 1px; opacity: 0; }
+  .mp-vol input::-moz-range-thumb { width: 1px; height: 1px; border: 0; opacity: 0; }
+  .mp-vol input:focus-visible { outline: 2px solid #6bc4ff; outline-offset: 3px; }
+  .mp-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+  /* A fila, aberta pelo "Fila" do player. */
+  .mp-queue {
+    position: absolute; inset: 0; z-index: 3; display: grid; align-content: start; gap: .6cqi;
+    padding: 2.6cqi 8.2cqi 0; overflow: hidden;
+    background: radial-gradient(40cqi 30cqi at 10% 0%, #ff8a6b3a, transparent 70%), #0f0b0b;
+    animation: q-in .35s var(--ease) both;
+  }
+  .mp-queue[hidden] { display: none; }
+  .mp-queue::after { content: ""; position: absolute; inset: auto 0 0; height: 9cqi; background: linear-gradient(transparent, #0f0b0b); pointer-events: none; }
+  @keyframes q-in { from { opacity: 0; translate: 4cqi 0; } }
+  .mp-qhead { display: flex; align-items: center; gap: 1.6cqi; margin-bottom: 1.2cqi; }
+  .mp-qhead b { font-size: 2.8cqi; font-weight: 700; color: #fff; }
+  .mp-qlabel { margin-top: 1.4cqi; font-size: 1.55cqi; font-weight: 600; color: #cfc6c2; }
+  .mp-qnow, .mp-qlist li { display: grid; grid-template-columns: 5.4cqi minmax(0, 1fr) auto; gap: 2cqi; align-items: center; padding: .9cqi 0; }
+  .mp-qlist { list-style: none; padding: 0; margin: 0; }
+  .mp-thumb { display: block; width: 5.4cqi; height: auto; aspect-ratio: 1; border-radius: 1.1cqi; }
+  .mp-qnow b, .mp-qlist b { display: block; font-size: 2cqi; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mp-qnow b { color: var(--tint); }
+  .mp-qnow small, .mp-qlist small { display: block; font-size: 1.45cqi; color: #cfc6c2; }
+  .mp-qlist .mp-tag { justify-self: end; }
+
+  @container mp (max-width: 520px) {
+    .mp-screen { aspect-ratio: auto; grid-template-columns: minmax(0, 1fr); padding: 5cqi 7cqi 8cqi; border-radius: 9cqi; }
+    .mp-side { display: contents; }
+    .mp-top { order: -1; margin-bottom: 5cqi; gap: 2cqi; }
+    .mp-cover { width: 76cqi; justify-self: center; border-radius: 6cqi; margin-bottom: 9cqi; box-shadow: 0 5cqi 0 -1.2cqi #00000075, 0 6cqi 12cqi -4cqi #000; }
+    .mp-ic { width: 10cqi; height: 10cqi; }
+    .mp-ic svg { width: 6.4cqi; height: 6.4cqi; }
+    .mp-now { font-size: 3cqi; gap: 2cqi; }
+    .mp-eq { height: 3.4cqi; gap: .8cqi; }
+    .mp-eq i { width: 1cqi; }
+    .mp-chip { font-size: 3.6cqi !important; padding: 2cqi 3.6cqi; gap: 1.6cqi; }
+    .mp-chip svg { width: 5cqi; height: 5cqi; }
+    .mp-meta { gap: 2cqi; }
+    .mp-title { font-size: 7.6cqi; }
+    .mp-artist { font-size: 4.3cqi; gap: 1.6cqi; }
+    .mp-album { font-size: 3.8cqi; gap: 1.6cqi; }
+    .mp-artist svg, .mp-album svg { width: 4.4cqi; height: 4.4cqi; }
+    .mp-artist .mp-go, .mp-album .mp-go { width: 3.8cqi; height: 3.8cqi; }
+    .mp-by { font-size: 3.4cqi; gap: 2cqi; }
+    .mp-face { width: 6cqi; height: 6cqi; font-size: 2.1cqi; }
+    .mp-tag { font-size: 2.9cqi; padding: .8cqi 2.4cqi; }
+    .mp-fav svg { width: 7cqi; height: 7cqi; }
+    .mp-prog { margin-top: 7cqi; row-gap: 3cqi; font-size: 3.2cqi; }
+    .mp-bar { height: 1.3cqi; }
+    .mp-ctrl { gap: 13cqi; margin-top: 3cqi; }
+    .mp-ctrl .mp-ic { width: 13cqi; height: 13cqi; }
+    .mp-ctrl .mp-ic svg { width: 7.4cqi; height: 7.4cqi; }
+    .mp-play { width: 17cqi; height: 17cqi; }
+    .mp-play svg { width: 7.6cqi; height: 7.6cqi; }
+    .mp-out { margin-top: 6cqi; gap: 3cqi; }
+    .mp-speaker { width: 11.5cqi; height: 11.5cqi; font-size: 3cqi; box-shadow: 0 0 0 .7cqi #0f0b0b, 0 0 0 1.4cqi var(--hue); }
+    .mp-vol { height: 11cqi; }
+    .mp-vol svg { left: 4.4cqi; width: 5.4cqi; height: 5.4cqi; }
+    .mp-queue { padding: 6cqi 7cqi; gap: 1.4cqi; }
+    .mp-qhead { gap: 3cqi; margin-bottom: 2cqi; }
+    .mp-qhead b { font-size: 6.4cqi; }
+    .mp-qlabel { font-size: 3.4cqi; margin-top: 3cqi; }
+    .mp-qnow, .mp-qlist li { grid-template-columns: 12cqi minmax(0, 1fr) auto; gap: 4cqi; padding: 2cqi 0; }
+    .mp-thumb { width: 12cqi; border-radius: 2.4cqi; }
+    .mp-qnow b, .mp-qlist b { font-size: 4.3cqi; }
+    .mp-qnow small, .mp-qlist small { font-size: 3.2cqi; }
+    .mp-qlist .mp-tag { grid-column: 2; justify-self: start; margin-top: -1cqi; }
+  }
+
+  /* Como começa: um caminho de quatro passos, ligado por um filete do espectro. */
+  .path { list-style: none; padding: 0; margin: 3.5rem 0 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.5rem; }
+  .path > li { position: relative; display: grid; grid-template-rows: auto 10.5rem auto 1fr; align-content: start; gap: 1.15rem; color: var(--muted); }
+  .path > li:nth-child(1) { --c: #ff8a6b; --c2: #f5e27a; }
+  .path > li:nth-child(2) { --c: #f5e27a; --c2: #7ee0a8; }
+  .path > li:nth-child(3) { --c: #7ee0a8; --c2: #6bc4ff; }
+  .path > li:nth-child(4) { --c: #6bc4ff; --c2: #9a7bff; }
+  .path > li::before {
+    content: ""; position: absolute; top: 1.3rem; left: 3.1rem; right: calc(-1.5rem + .5rem); height: 1px;
+    background: linear-gradient(90deg, var(--c), var(--c2)); transform-origin: left center; scale: var(--r, 1) 1;
+  }
+  .path > li:last-child::before { display: none; }
+  .node {
+    position: relative; z-index: 1; width: 2.6rem; height: 2.6rem; border-radius: 50%; display: grid; place-items: center;
+    font: italic 400 1.25rem/1 var(--serif); color: var(--text); background: var(--bg); box-shadow: inset 0 0 0 1px var(--c);
+  }
+  .path > li:last-child .node { background: var(--c); color: #04131d; box-shadow: none; }
+  .path > li > h3 { font-size: 1.35rem; color: var(--text); margin-top: .2rem; }
+  .path > li > p { font-size: .94rem; max-width: 30ch; }
+  .path-ui {
+    margin: 0; list-style: none; display: grid; align-content: center; gap: .7rem; padding: .95rem 1rem; border-radius: 16px;
+    background: #0b0b0e; border: 1px solid #ffffff12; box-shadow: 0 14px 30px -18px #000, inset 0 1px 0 #ffffff08;
+    font-size: .8rem; color: #d6d4cf;
+  }
+  .path-ui b { font-weight: 500; color: var(--text); }
+  .path-ui small { display: block; color: var(--muted); font-size: .72rem; }
+  .pu-when, .pu-doc { display: flex; align-items: center; gap: .75rem; }
+  .pu-doc { padding-top: .7rem; border-top: 1px solid var(--line); }
+  .pu-day { width: 2.6rem; padding: .3rem 0 .35rem; border-radius: 10px; display: grid; justify-items: center; background: #ffffff0c; font: 600 1.05rem/1.05 "Geist Mono", monospace; color: var(--text); flex: none; }
+  .pu-day small { font: 500 .58rem var(--sans); letter-spacing: .08em; text-transform: uppercase; color: #ffb39c; }
+  .pu-file { width: 2rem; height: 2.5rem; margin-inline: .3rem; flex: none; border-radius: 4px; background: linear-gradient(160deg, #ffffff30, #ffffff10); clip-path: polygon(0 0, 68% 0, 100% 26%, 100% 100%, 0 100%); }
+  .pu-app { display: grid; grid-template-columns: 2.9rem minmax(0, 1fr) auto; gap: .75rem; align-items: center; }
+  .pu-icon { width: 2.9rem; height: 2.9rem; border-radius: 24%; display: grid; place-items: center; background: linear-gradient(160deg, #e2c27c, #b48a3a); color: #2b1d00; font: 600 .82rem var(--sans); box-shadow: 0 8px 16px -10px #000; }
+  .pu-get { padding: .3rem .85rem; border-radius: 999px; background: #ffffff1c; color: var(--text); font-weight: 600; font-size: .72rem; }
+  .pu-stores { display: flex; gap: .4rem; }
+  .pu-stores span { padding: .25rem .65rem; border-radius: 999px; border: 1px solid #ffffff1f; font-size: .68rem; color: var(--muted); }
+  .pu-check li { display: grid; grid-template-columns: 1.45rem minmax(0, 1fr) auto; gap: .6rem; align-items: center; }
+  .pu-check small { color: #8fe3a5; }
+  .pu-tick { width: 1.45rem; height: 1.45rem; border-radius: 50%; display: grid; place-items: center; background: #30d1581f; box-shadow: inset 0 0 0 1px #30d15850; }
+  .pu-tick svg { width: .8rem; fill: none; stroke: #30d158; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+  .pu-booked { border-color: #30d15870; background: linear-gradient(#30d1580c, transparent 70%), #0b0b0e; }
+  .pu-label { display: flex; justify-content: space-between; gap: .5rem; font-size: .6rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #30d158; }
+  .pu-label .num { color: var(--text); letter-spacing: 0; font-size: .74rem; }
+  .pu-slot { display: grid; grid-template-columns: 2.8rem minmax(0, 1fr); gap: .75rem; align-items: center; }
+  .pu-date { display: grid; justify-items: center; padding: .3rem 0; border-radius: 10px; background: #30d15817; box-shadow: inset 0 0 0 1px #30d15850; font: 600 1rem/1.1 "Geist Mono", monospace; color: var(--text); }
+  .pu-date small { font: 600 .52rem var(--sans); letter-spacing: .08em; text-transform: uppercase; color: #30d158; }
+
+  /* Cor por capítulo: cada parte da página pega uma faixa do espectro da marca.
+     --hue tinge o itálico do título, a luz e o filete dos cartões e o que está
+     "selecionado" nas ilustrações. Verde (pago, atendido) e amarelo (ao vivo,
+     estrelas) continuam com o significado de sempre. */
+  main { --hue: var(--text); }
+  #marca { --hue: #b49cff; }
+  #atendimento { --hue: #6bc4ff; }
+  #planos, #gestao, #campanhas { --hue: #e8b23a; }
+  #equipe, #musica, #mais { --hue: #ff8a6b; }
+  #marca, #atendimento, #planos, #gestao, #campanhas, #equipe, #musica, #mais {
+    --tint: color-mix(in oklab, var(--hue) 62%, var(--text));
+  }
+  section[id] h2 em { color: var(--tint, inherit); }
+  .viz { background: radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--hue) 9%, transparent), transparent 55%), var(--surface); }
+  .viz::before { inset: 0 24px auto; background: linear-gradient(90deg, transparent, var(--hue) 30%, var(--hue) 70%, transparent); opacity: .6; }
+  .editor { background: radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--hue) 13%, transparent), transparent 55%), var(--surface); }
+  .more div, .trio div { border-top-color: color-mix(in srgb, var(--hue) 32%, transparent); }
+
+  /* Cliente: o que o cliente toca fica azul. */
+  .chip.on, .pair .yes { background: var(--hue); border-color: var(--hue); color: #04131d; }
+  .recipes .on { background: var(--hue); border-color: var(--hue); color: #2b1d00; }
+
+  /* Espaço: a música e a fila na cor do capítulo. */
+
+  /* Fecho: o espectro inteiro volta por trás do convite. */
+  .cta { position: relative; isolation: isolate; overflow: hidden; }
+  .cta::before {
+    content: ""; position: absolute; z-index: -1; left: 50%; bottom: 18%; width: min(760px, 90%); height: 9rem; translate: -50% 0;
+    background: var(--spectrum); filter: blur(80px); opacity: .3; border-radius: 50%;
+  }
+
+  /* Momento da página: o atendimento acontece passo a passo, na rolagem. Cada
+     passo entra e só depois faz o seu gesto (escolher, ler, aceitar, pagar);
+     o passo seguinte só entra quando esse gesto termina. O story.js manda o
+     andamento do gesto em --a (0 → 1) e o "aperto" em --d (sobe e desce).
+     O estado padrão é o final: sem script, tudo aparece pronto. */
+  .steps4 .chip.on, .steps4 .pair .yes { transition: background-color .3s var(--ease), border-color .3s, color .3s; }
+  .steps4.armed .chip.on, .steps4.armed .pair .yes {
+    background: color-mix(in srgb, var(--hue) calc(var(--f) * 100%), transparent);
+    border-color: color-mix(in srgb, var(--hue) calc(var(--f) * 100%), #ffffff22);
+    color: color-mix(in srgb, #04131d calc(var(--f) * 100%), var(--text));
+  }
+  .steps4.armed .chip.on { --f: clamp(0, calc((var(--a, 1) - .15) * 2.5), 1); scale: calc((.55 + .45 * var(--r, 1)) * (1 - .14 * var(--d, 0))); }
+  .steps4.armed .pair .yes { --f: clamp(0, calc((var(--a, 1) - .35) * 3), 1); scale: calc(1 - .08 * var(--d, 0)); }
+
+  .qr { position: relative; overflow: hidden; }
+  .qr::after {
+    content: ""; position: absolute; inset: 0 0 auto; height: 32%; opacity: 0; translate: 0 -100%;
+    background: linear-gradient(transparent, color-mix(in srgb, var(--hue) 45%, transparent));
+    border-bottom: 2px solid var(--hue);
+  }
+  .steps4.armed .qr::after { opacity: min(1, calc(var(--d, 0) * 4)); translate: 0 calc(-100% + var(--a, 1) * 420%); }
+
+  .ring path { stroke-dasharray: 1 2; stroke-dashoffset: 0; }
+  .steps4.armed .ring {
+    --f: clamp(0, calc(var(--a, 1) * 3), 1);
+    background: color-mix(in srgb, #30d15814 calc(var(--f) * 100%), transparent);
+    border-color: color-mix(in srgb, #30d15866 calc(var(--f) * 100%), #ffffff22);
+  }
+  .steps4.armed .ring path { stroke-dashoffset: calc(1 - clamp(0, calc((var(--a, 1) - .1) * 2.2), 1)); }
+  .steps4.armed .paid b, .steps4.armed .paid small {
+    --f: clamp(0, calc((var(--a, 1) - .55) * 2.5), 1);
+    opacity: var(--f); filter: blur(calc((1 - var(--f)) * 6px));
+  }
+
+  /* Laços (luz do topo, ponto "em atendimento", equalizador) param fora da tela. */
+  .paused, .paused * { animation-play-state: paused !important; }
+
+  .btn:active { transform: scale(.97); transition-duration: .1s; }
+
+  /* Ilustrações que respondem como o app: escolher outro horário refaz o
+     atendimento; o player de música toca, pausa e pula. */
+  button.chip { background: transparent; color: var(--text); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  button.chip { transition: border-color .2s, background-color .3s var(--ease), color .3s; }
+  button.chip:not(.on):hover { border-color: color-mix(in srgb, var(--hue) 60%, transparent); }
+  button.chip:active { scale: .94; }
+
+  /* ── Overdrive ─────────────────────────────────────────────────────── */
+
+  /* A · Prisma de verdade no topo (WebGL). Sem WebGL, fica a luz em CSS. */
+  .prism-gl { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; opacity: 0; transition: opacity 1.6s var(--ease); pointer-events: none; }
+  .hero.gl .prism-gl { opacity: 1; }
+  .hero .beam { transition: opacity 1.6s var(--ease); }
+  .hero.gl .beam { opacity: 0; }
+
   @media (max-width: 1080px) {
     .steps4 { grid-template-columns: 1fr 1fr; gap: 2.5rem 1.25rem; }
+    .feats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .path { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 2.75rem; }
+    .path > li:nth-child(2n)::before { display: none; }
+    .feat.tall { grid-row: auto; }
+    .cal-grid { grid-template-rows: repeat(12, 1.55rem); }
+  }
+  @media (max-width: 600px) {
+    .feats { grid-template-columns: minmax(0, 1fr); gap: .85rem; }
+    .mplayer { padding: 6px; border-radius: 34px; }
+    .path { grid-template-columns: minmax(0, 1fr); row-gap: 2.4rem; }
+    .path > li { grid-template-rows: none; padding-left: 3.7rem; gap: .9rem; }
+    .path > li > .node { position: absolute; left: 0; top: -.35rem; }
+    .path > li > h3 { order: -1; margin-top: 0; }
+    .path > li > p { order: -1; }
+    .path > li::before, .path > li:nth-child(2n)::before {
+      display: block; top: 2.4rem; bottom: -2.2rem; left: 1.3rem; right: auto; width: 1px; height: auto;
+      background: linear-gradient(180deg, var(--c), var(--c2)); transform-origin: center top; scale: 1 var(--r, 1);
+    }
+    .path > li:last-child::before { display: none; }
+    .feat.wide, .feat.tall { grid-column: auto; }
+    .feat { padding: 1.1rem 1.1rem 1.3rem; gap: 1.1rem; }
+    .strip { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+    .log li { grid-template-columns: 2.6rem 1fr; row-gap: .1rem; }
+    .log li span { grid-column: 2; }
+    .log li b { grid-column: 2; }
+    .blk span { display: none; }
+    .att-row span, .views span { padding: .6rem .65rem; }
+    .att-row b { font-size: 1.1rem; }
+    .att-row span, .day-row span { font-size: .7rem; }
+    .views small { font-size: .66rem; }
   }
   @media (max-width: 900px) {
-    .split2, .split2.flip { grid-template-columns: minmax(0, 1fr); }
+    .split2, .split2.flip, .music-split { grid-template-columns: minmax(0, 1fr); }
     .split2.flip > .viz { order: 0; }
-    .camp, .trio { grid-template-columns: 1fr; }
+    .trio { grid-template-columns: 1fr; }
+    .camp { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; gap: 2.5rem; }
+    .camp figure { grid-row: auto; grid-template-rows: none; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); align-items: center; gap: 2rem; }
+  }
+  @media (max-width: 600px) {
+    .camp figure { grid-template-columns: minmax(0, 1fr); gap: 1.25rem; }
   }
   @media (max-width: 560px) {
     .steps4 { grid-template-columns: 1fr; }
@@ -379,11 +842,41 @@
     .viz { padding: 1.35rem; }
   }
 </style>
+<link rel="stylesheet" href="story.css">
+<script src="story.js" defer></script>
 </head>
 <body>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <!-- Ícones do player de música, no traço dos ícones do app -->
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="m15 5-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h12M3 11h12M3 16h7"/><circle cx="16" cy="17.5" r="2.5"/><path d="M18.5 17.5V8.5l3-1"/></g></symbol>
+  <symbol id="i-phones" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3.5" width="18" height="7" rx="2"/><rect x="3" y="13.5" width="18" height="7" rx="2"/></g></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m11 7.6-6 8.2a1 1 0 0 0 .1 1.3l.8.8a1 1 0 0 0 1.3.1L15.1 12"/><circle cx="16" cy="7" r="5"/></g></symbol>
+  <symbol id="i-disc" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><circle cx="12" cy="12" r="3.2"/></g></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.3a4.3 4.3 0 0 1 7.5 2.5C19.5 15.4 12 20 12 20Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-prev" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 5v14"/><path d="M19 5.5 9.5 12l9.5 6.5Z"/></g></symbol>
+  <symbol id="i-next" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 5v14"/><path d="M5 5.5 14.5 12 5 18.5Z"/></g></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><g fill="currentColor"><rect x="6.5" y="5" width="3.6" height="14" rx="1.2"/><rect x="13.9" y="5" width="3.6" height="14" rx="1.2"/></g></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.6v12.8a1 1 0 0 0 1.53.85l10.1-6.4a1 1 0 0 0 0-1.7L9.53 4.75A1 1 0 0 0 8 5.6Z" fill="currentColor"/></symbol>
+  <symbol id="i-vol" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6.5 9H3.5v6h3L11 19Z"/><path d="M15.5 9.5a3.5 3.5 0 0 1 0 5"/></g></symbol>
+  <symbol id="mp-art" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <linearGradient id="mp-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd3a3"/><stop offset=".48" stop-color="#ff8a6b"/><stop offset="1" stop-color="#5b1f33"/></linearGradient>
+        <radialGradient id="mp-sun" cx=".5" cy=".5" r=".5"><stop offset=".6" stop-color="#fff4e4"/><stop offset="1" stop-color="#fff4e4" stop-opacity="0"/></radialGradient>
+      </defs>
+      <rect width="100" height="100" fill="url(#mp-sky)"/>
+      <circle cx="63" cy="40" r="24" fill="url(#mp-sun)" opacity=".9"/>
+      <g fill="none" stroke="#fff" stroke-linecap="round">
+        <path d="M-4 64c9-4 16-4 25 0s16 4 25 0 16-4 25 0 16 4 33 0" stroke-opacity=".55" stroke-width="1.4"/>
+        <path d="M-4 73c9-4 16-4 25 0s16 4 25 0 16-4 25 0 16 4 33 0" stroke-opacity=".38" stroke-width="1.2"/>
+        <path d="M-4 82c9-4 16-4 25 0s16 4 25 0 16-4 25 0 16 4 33 0" stroke-opacity=".24" stroke-width="1"/>
+        <path d="M-4 91c9-4 16-4 25 0s16 4 25 0 16-4 25 0 16 4 33 0" stroke-opacity=".14" stroke-width="1"/>
+      </g>
+  </symbol>
 </svg>
 
 <header>
@@ -397,11 +890,11 @@
     </a>
     <ul>
       <li><a href="#marca">Sua marca</a></li>
-      <li><a href="#atendimento">Como funciona</a></li>
+      <li><a href="#atendimento">Atendimento</a></li>
+      <li><a href="#planos">Assinaturas</a></li>
       <li><a href="#gestao">Gestão</a></li>
       <li><a href="#campanhas">Campanhas</a></li>
       <li><a href="#musica">Música</a></li>
-      <li><a href="#comecar">Como começar</a></li>
     </ul>
     <a href="#contato" class="btn">Pedir demonstração</a>
   </nav>
@@ -412,25 +905,26 @@
     <div class="beam" aria-hidden="true"></div>
     <div class="wrap hero-grid">
       <div>
-        <h1>O app de agendamento com o <em>nome do seu negócio.</em></h1>
-        <p class="lede">Seus clientes marcam, pagam e avaliam pelo app da sua marca. Você acompanha o dia e o caixa de onde estiver.</p>
+        <h1>Agenda cheia e cliente fiel, <em>com o app do seu negócio.</em></h1>
+        <p class="lede">Seus clientes marcam e pagam pelo app com o nome e as cores da sua marca. Você vende assinaturas, chama de volta quem sumiu e vê quanto cada ação rendeu.</p>
         <p class="for">Para barbearias, salões, clínicas, estúdios e todo negócio que atende com hora marcada.</p>
         <div class="actions">
-          <a href="#contato" class="btn btn-solid">Pedir uma demonstração <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+          <a href="#contato" class="btn btn-solid">Pedir demonstração <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
           <a href="#marca" class="btn">Ver o app</a>
         </div>
       </div>
       <div class="phone"><img src="telas/inicio.webp" width="390" height="844" alt="Tela inicial do app do Estúdio Alvorada: foto do espaço, saudação à cliente Marina e o próximo agendamento, corte masculino com João Batista."></div>
     </div>
+    <a class="cue" href="#marca"><span>Role para ver como funciona</span><i aria-hidden="true"></i></a>
   </section>
-
   <div class="wrap divider" aria-hidden="true"></div>
 
   <section id="marca">
     <div class="wrap">
-      <h2>Um app que <em>parece o seu negócio.</em></h2>
-      <p class="lede">Escolha o estilo e aplique o seu logo, as suas cores e a foto do seu espaço. O app vai para as lojas com o nome do seu negócio.</p>
+      <h2>A sua marca no celular <em>de cada cliente.</em></h2>
+      <p class="lede">O app vai para a App Store e o Google Play com o nome do seu negócio. Escolha o estilo e aplique o seu logo, as suas cores e a foto do seu espaço.</p>
 
+      <div class="styles-track">
       <div class="styles">
         <figure>
           <div class="phone"><img src="telas/estilo-cartao.webp" width="390" height="844" loading="lazy" alt="Estilo Cartão: o próximo agendamento e um cartão de vidro com a foto da barbearia e o nome da cliente."></div>
@@ -449,32 +943,53 @@
           <figcaption><b>Art déco</b>Dourado, molduras e o ar de um salão clássico</figcaption>
         </figure>
       </div>
+      </div>
 
-      <div class="editor">
-        <div class="phone"><img src="telas/marca.webp" width="390" height="844" loading="lazy" alt="Editor de marca: prévia do app ao vivo, cor principal e segunda cor, com sugestões de cores."></div>
+      <div class="editor" data-beats="3">
+        <div class="phone preview" role="img" aria-label="Editor de marca do app: a prévia da tela do cliente no topo, a cor principal dourada, a segunda cor e as sugestões de segunda cor. A prévia muda conforme a cor escolhida.">
+          <div class="screen">
+            <img src="telas/marca.webp" width="390" height="844" loading="lazy" alt="">
+            <img src="telas/marca-1.webp" width="390" height="844" loading="lazy" alt="">
+            <img src="telas/marca-2.webp" width="390" height="844" loading="lazy" alt="">
+            <img src="telas/marca-3.webp" width="390" height="844" loading="lazy" alt="">
+            <img src="telas/marca-4.webp" width="390" height="844" loading="lazy" alt="">
+            <img src="telas/marca-5.webp" width="390" height="844" loading="lazy" alt="">
+            <span class="hit" style="--x:9.49" data-c="1"></span><span class="hit" style="--x:29.74" data-c="2"></span><span class="hit" style="--x:50" data-c="3"></span><span class="hit" style="--x:70.26" data-c="4"></span><span class="hit" style="--x:90.51" data-c="5"></span>
+            <span class="tap"></span>
+          </div>
+        </div>
         <div>
-          <h3>Você mesmo ajusta, <em>vendo a prévia.</em></h3>
-          <p class="lede">Troque cores, fotos, fonte e estilo e veja o app mudar antes de salvar.</p>
+          <h3>Mude uma cor e <em>veja na hora.</em></h3>
+          <p class="lede">Cores, fotos, fonte e estilo: você mesmo ajusta, e a prévia mostra o app do cliente mudando antes de salvar.</p>
+          <p class="picks-label" id="picks-label">Experimente uma das sugestões de segunda cor:</p>
+          <div class="picks" role="group" aria-labelledby="picks-label">
+            <button type="button" class="pick" style="--c:#8cb477" data-c="1" aria-pressed="false" aria-label="Verde"></button>
+            <button type="button" class="pick" style="--c:#e89383" data-c="2" aria-pressed="false" aria-label="Coral"></button>
+            <button type="button" class="pick" style="--c:#62b6bd" data-c="3" aria-pressed="false" aria-label="Turquesa"></button>
+            <button type="button" class="pick" style="--c:#71b1d4" data-c="4" aria-pressed="false" aria-label="Azul-claro"></button>
+            <button type="button" class="pick" style="--c:#8da9e1" data-c="5" aria-pressed="false" aria-label="Lavanda"></button>
+          </div>
         </div>
       </div>
     </div>
   </section>
-
   <div class="wrap divider" aria-hidden="true"></div>
 
   <section id="atendimento">
     <div class="wrap">
-      <h2>Do agendamento ao pagamento, <em>tudo no celular.</em></h2>
-      <div class="steps4">
+      <h2>O cliente marca sozinho <em>e paga pelo app.</em></h2>
+      <p class="lede">Sua equipe não precisa largar o atendimento para marcar horário, e o serviço extra sugerido na hora entra na conta com um toque do cliente.</p>
+      <p class="for">Toque em outro horário para ver de novo.</p>
+      <div class="steps4" data-seq>
         <figure>
-          <div class="viz tile" aria-hidden="true">
-            <div class="slots">
-              <span class="chip gone">09:00</span><span class="chip">09:30</span><span class="chip">10:00</span>
-              <span class="chip gone">14:00</span><span class="chip on">14:30</span><span class="chip">15:00</span>
-              <span class="chip">16:30</span><span class="chip gone">17:00</span><span class="chip">17:30</span>
+          <div class="viz tile">
+            <div class="slots" role="group" aria-label="Horários livres de exemplo">
+              <span class="chip gone" aria-hidden="true">09:00</span><button type="button" class="chip" aria-pressed="false">09:30</button><button type="button" class="chip" aria-pressed="false">10:00</button>
+              <span class="chip gone" aria-hidden="true">14:00</span><button type="button" class="chip on" aria-pressed="true">14:30</button><button type="button" class="chip" aria-pressed="false">15:00</button>
+              <button type="button" class="chip" aria-pressed="false">16:30</button><span class="chip gone" aria-hidden="true">17:00</span><button type="button" class="chip" aria-pressed="false">17:30</button>
             </div>
           </div>
-          <figcaption><h3>Escolhe o horário</h3><p>Serviço, profissional e horário em poucos toques.</p></figcaption>
+          <figcaption><h3>Marca a qualquer hora</h3><p>Serviço, profissional e horário em poucos toques, sem ligar para ninguém.</p></figcaption>
         </figure>
         <figure>
           <div class="viz tile" aria-hidden="true"><div class="qr"><svg id="qr" viewBox="0 0 25 25" shape-rendering="crispEdges"></svg></div></div>
@@ -488,63 +1003,59 @@
               <div class="pair"><span>Recusar</span><span class="yes">Aceitar</span></div>
             </div>
           </div>
-          <figcaption><h3>Aprova o extra</h3><p>O cliente aceita no app antes de entrar na conta.</p></figcaption>
+          <figcaption><h3>Aceita o extra</h3><p>O profissional sugere mais um serviço e o cliente aprova no celular. O valor do atendimento sobe ali mesmo.</p></figcaption>
         </figure>
         <figure>
           <div class="viz tile" aria-hidden="true">
-            <div class="paid"><span class="ring"><svg viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7"/></svg></span><b class="num">R$ 75,00</b><small>Pago com Pix</small></div>
+            <div class="paid"><span class="ring"><svg viewBox="0 0 24 24"><path pathLength="1" d="M5 12.5 10 17.5 19 7"/></svg></span><b class="num">R$ 75,00</b><small>Pago com Pix</small></div>
           </div>
-          <figcaption><h3>Paga pelo app</h3><p>Pix ou cartão na hora, ou no balcão.</p></figcaption>
+          <figcaption><h3>Paga pelo app</h3><p>Pix ou cartão pelo celular, ou no balcão.</p></figcaption>
         </figure>
       </div>
     </div>
   </section>
-
   <div class="wrap divider" aria-hidden="true"></div>
 
   <section id="planos">
     <div class="wrap">
       <div class="split2">
         <div>
-          <h2>Clube de assinatura, <em>pronto para vender.</em></h2>
-          <p class="lede">Assinatura é dinheiro certo todo mês e cliente que volta sempre. Você monta o plano e o app faz a venda, mostrando ao cliente quanto ele economiza.</p>
+          <h2>Clube de assinatura: <em>receita certa todo mês.</em></h2>
+          <p class="lede">O assinante paga todo mês e volta mais vezes. Você monta o plano, e o app vende por você.</p>
         </div>
-        <div class="viz" role="img" aria-label="Quatro cortes de R$ 55,00 somam R$ 220,00 sem o plano; com o plano, R$ 128,00. Economia de R$ 92,00 por mês.">
-          <div class="compare">
-            <div class="col">
-              <div class="stack"><span>Corte · R$ 55</span><span>Corte · R$ 55</span><span>Corte · R$ 55</span><span>Corte · R$ 55</span></div>
-              <b class="num">R$ 220</b><small>sem o plano</small>
-            </div>
-            <div class="col">
-              <div class="stack"><span class="save">− R$ 92</span><span class="gold">Clube Corte</span></div>
-              <b class="num">R$ 128</b><small>com o plano</small>
-            </div>
-          </div>
-          <p class="viz-foot"><span class="gold-t">Economize R$ 92,00</span> todo mês</p>
+        <div class="viz" role="img" aria-label="Receita do clube de assinatura: R$ 5.464,00 por mês, de 38 assinantes, seis meses seguidos de alta, com 6 assinantes novos em novembro.">
+          <p class="viz-head"><span>Clube · por mês</span><span class="up">+6 assinantes</span></p>
+          <b class="big num">R$ 5.464,00</b>
+          <div class="mrr"><span style="--h:44%"></span><span style="--h:52%"></span><span style="--h:61%"></span><span style="--h:71%"></span><span style="--h:84%"></span><span style="--h:100%"></span></div>
+          <p class="mrr-x"><span>jun</span><span>jul</span><span>ago</span><span>set</span><span>out</span><span>nov</span></p>
+          <p class="viz-foot split-foot"><span class="mut">Assinantes ativos</span><b class="num">38</b></p>
         </div>
       </div>
 
       <div class="camp">
         <figure>
           <div class="viz" aria-hidden="true">
-            <div class="plans-mini">
-              <div><b>Corte mensal</b><span class="num">R$ 90</span><small>4 cortes</small></div>
-              <div class="best"><em>Melhor valor</em><b>Corte e barba</b><span class="num">R$ 128</span><small>4 cortes + 2 barbas</small></div>
+            <div class="compare">
+              <div class="col">
+                <div class="stack"><span>Corte · R$ 55</span><span>Corte · R$ 55</span><span>Corte · R$ 55</span><span>Corte · R$ 55</span></div>
+                <b class="num">R$ 220</b><small>sem o plano</small>
+              </div>
+              <div class="col">
+                <div class="stack"><span class="save">− R$ 92</span><span class="gold">Clube Corte</span></div>
+                <b class="num">R$ 128</b><small>com o plano</small>
+              </div>
             </div>
           </div>
-          <figcaption><h3>Monte do seu jeito</h3><p>Escolha os serviços, as quantidades e quem atende. O plano de melhor valor ganha destaque sozinho.</p></figcaption>
+          <figcaption><h3>O app vende por você</h3><p>O cliente vê quanto economiza com o plano e assina ali mesmo, pelo app.</p></figcaption>
         </figure>
         <figure>
           <div class="viz" aria-hidden="true">
-            <div class="covered">
-              <div class="slots">
-                <span class="chip">09:30</span><span class="chip goldf">10:00</span><span class="chip goldf">10:30</span>
-                <span class="chip gone">14:00</span><span class="chip goldf">14:30</span><span class="chip">15:00</span>
-              </div>
-              <span class="free"><svg viewBox="0 0 24 24"><path d="M4 18h16l1-10-5 4-4-7-4 7-5-4Z"/></svg>Grátis no seu plano</span>
+            <div class="plans-mini">
+              <div><b>Clube Corte</b><span class="num">R$ 128</span><small>4 cortes</small></div>
+              <div class="best"><em>Melhor valor</em><b>Corte e barba</b><span class="num">R$ 178</span><small>4 cortes + 2 barbas</small></div>
             </div>
           </div>
-          <figcaption><h3>O assinante sente a vantagem</h3><p>Os serviços do plano aparecem como grátis e os horários cobertos ficam em dourado.</p></figcaption>
+          <figcaption><h3>Monte do seu jeito</h3><p>Escolha os serviços, as quantidades e quem atende. O plano de melhor valor ganha destaque sozinho.</p></figcaption>
         </figure>
         <figure>
           <div class="viz" aria-hidden="true">
@@ -556,40 +1067,17 @@
               </ul>
             </div>
           </div>
-          <figcaption><h3>Renovação sem esforço</h3><p>No cartão, renova sozinho todo mês. Para os outros, o app lista quem está vencendo para você chamar.</p></figcaption>
+          <figcaption><h3>Renovação sem esforço</h3><p>No cartão, o plano renova sozinho. Quem paga de outro jeito aparece na lista de vencimentos, pronto para você chamar.</p></figcaption>
         </figure>
       </div>
     </div>
   </section>
 
-  <div class="wrap divider" aria-hidden="true"></div>
-
-  <section id="equipe">
-    <div class="wrap split2 flip">
-      <div>
-        <h2>Sua equipe atende <em>pelo celular.</em></h2>
-        <p class="lede">Cada profissional vê a própria agenda, atende e encerra pelo app. A comissão de cada atendimento aparece na hora.</p>
-      </div>
-      <div class="viz" role="img" aria-label="Agenda de hoje do profissional: dois atendimentos concluídos, um em andamento às 14:30 e um a seguir às 16:00; ganhos de hoje R$ 186,00.">
-        <p class="viz-head"><span>Hoje</span><span class="mut">quinta, 26</span></p>
-        <ul class="agenda">
-          <li><span class="num">09:00</span><span>Ana · Corte</span><em class="done">atendido</em></li>
-          <li><span class="num">10:30</span><span>Bruno · Corte e barba</span><em class="done">atendido</em></li>
-          <li class="now"><span class="num">14:30</span><span>Lucas · Corte</span><em class="live"><i></i>em atendimento</em></li>
-          <li><span class="num">16:00</span><span>Marina · Barba</span><em>a seguir</em></li>
-        </ul>
-        <p class="viz-foot split-foot"><span class="mut">Seus ganhos hoje</span><b class="num">R$ 186,00</b></p>
-      </div>
-    </div>
-  </section>
-
-  <div class="wrap divider" aria-hidden="true"></div>
-
   <section id="gestao">
     <div class="wrap">
-      <div class="split2">
+      <div class="split2 flip">
         <div>
-          <h2>Os números do seu negócio, <em>sem planilha.</em></h2>
+          <h2>Saiba quanto entrou <em>e onde dá para crescer.</em></h2>
           <p class="lede">Receita, ocupação, retenção e desempenho da equipe, sempre comparados com o período anterior. De uma unidade ou da rede inteira.</p>
         </div>
         <div class="viz" role="img" aria-label="Relatório de receita dos últimos 30 dias: R$ 14.832,00, 11% acima do período anterior, com barras diárias; 72% pago pelo app.">
@@ -607,7 +1095,7 @@
             <div class="heat" id="heat"></div>
             <p class="legend"><span>Seg → Sáb</span><span>9h → 19h</span></p>
           </div>
-          <figcaption><h3>Ocupação hora a hora</h3><p>Veja os horários vazios da semana e onde cabe mais um profissional.</p></figcaption>
+          <figcaption><h3>Horários vazios à vista</h3><p>A ocupação hora a hora mostra onde cabe uma campanha e onde cabe mais um profissional.</p></figcaption>
         </figure>
         <figure>
           <div class="viz" aria-hidden="true">
@@ -636,145 +1124,310 @@
     </div>
   </section>
 
-  <div class="wrap divider" aria-hidden="true"></div>
-
   <section id="campanhas">
     <div class="wrap">
-      <h2>Campanhas que trazem o cliente <em>de volta.</em></h2>
-      <p class="lede">O app encontra os clientes certos, manda a mensagem e mostra quanto ela rendeu.</p>
-      <div class="camp">
-        <figure>
-          <div class="viz" aria-hidden="true">
+      <div class="split2">
+        <div>
+          <h2>Mensagens que trazem o cliente <em>de volta.</em></h2>
+          <p class="lede">Filtros inteligentes encontram quem sumiu, quem faz aniversário ou quem está com o plano acabando. O app manda a mensagem e mostra quanto ela trouxe em atendimentos.</p>
+        </div>
+        <div class="viz send" role="img" aria-label="Campanha Recorrência caiu para 64 clientes, com a notificação Sentimos sua falta, Marina. Em 7 dias, 29 abriram, 17 agendaram, e os agendamentos renderam R$ 935,00.">
+          <div>
+            <p class="viz-head"><span>Quem recebe</span><span class="mut num">64 clientes</span></p>
             <ul class="recipes">
-              <li>Aniversário</li><li class="on">Plano acabando</li><li>Sumiu há 60 dias</li><li>Gastou bem no mês</li><li>Depois da 1ª visita</li>
+              <li>Aniversário</li><li class="on">Recorrência caiu</li><li>Plano acabando</li>
             </ul>
           </div>
-          <figcaption><h3>Receitas prontas</h3><p>Escolha uma, ajuste o texto e deixe rodando sozinha.</p></figcaption>
-        </figure>
-        <figure>
-          <div class="viz" aria-hidden="true">
-            <div class="ab">
-              <div><span>A</span><i style="--w:48%"></i><b class="num">24%</b></div>
-              <div class="win"><span>B</span><i style="--w:72%"></i><b class="num">36%</b></div>
-              <small>A mensagem B vai para o restante do público</small>
-            </div>
+          <div class="note">
+            <span class="note-ic">EA</span>
+            <div><small>Estúdio Alvorada · agora</small><b>Sentimos sua falta, Marina</b><span>Já faz um tempo desde a sua última visita. Que tal marcar o próximo horário?</span></div>
           </div>
-          <figcaption><h3>Teste A/B</h3><p>Duas versões da mensagem, e a melhor vai sozinha para todos.</p></figcaption>
-        </figure>
-        <figure>
-          <div class="viz" aria-hidden="true">
-            <div class="funnel">
-              <span style="--w:100%">Receberam <b class="num">1.000</b></span>
-              <span style="--w:84%">Abriram <b class="num">230</b></span>
-              <span style="--w:62%">Agendaram <b class="num">46</b></span>
-              <p class="num">R$ 2.070,00 <small>em atendimentos</small></p>
-            </div>
+          <div class="reach">
+            <p class="viz-head"><span>Em 7 dias</span></p>
+            <div class="reach-row"><span><b class="num">64</b>receberam</span><span><b class="num">29</b>abriram</span><span><b class="num">17</b>agendaram</span></div>
+            <p class="gain"><b class="num">R$ 935,00</b>em atendimentos</p>
           </div>
-          <figcaption><h3>Resultado em reais</h3><p>Um grupo de controle mostra o que veio só por causa da campanha.</p></figcaption>
-        </figure>
+        </div>
+      </div>
+      <ul class="tags more-reports" aria-label="Também nas campanhas">
+        <li>Receitas prontas</li><li>Notificação ou tela cheia</li><li>Teste A/B</li><li>Grupo de controle</li>
+      </ul>
+    </div>
+  </section>
+  <div class="wrap divider" aria-hidden="true"></div>
+
+  <section id="equipe">
+    <div class="wrap split2 flip">
+      <div>
+        <h2>Cada profissional cuida da agenda <em>pelo próprio celular.</em></h2>
+        <p class="lede">Cada um vê os seus horários, atende e encerra pelo app, e a comissão de cada atendimento aparece na hora. Menos recado no balcão e menos conta para fechar no fim do mês.</p>
+      </div>
+      <div class="viz" role="img" aria-label="Agenda de hoje do profissional: dois atendimentos concluídos, um em andamento às 14:30 e um a seguir às 16:00; ganhos de hoje R$ 186,00.">
+        <p class="viz-head"><span>Hoje</span><span class="mut">quinta, 26</span></p>
+        <ul class="agenda">
+          <li><span class="num">09:00</span><span>Ana · Corte</span><em class="done">atendido</em></li>
+          <li><span class="num">10:30</span><span>Bruno · Corte e barba</span><em class="done">atendido</em></li>
+          <li class="now"><span class="num">14:30</span><span>Lucas · Corte</span><em class="live"><i></i>em atendimento</em></li>
+          <li><span class="num">16:00</span><span>Marina · Barba</span><em>a seguir</em></li>
+        </ul>
+        <p class="viz-foot split-foot"><span class="mut">Seus ganhos hoje</span><b class="num">R$ 186,00</b></p>
       </div>
     </div>
   </section>
 
-  <div class="wrap divider" aria-hidden="true"></div>
-
   <section id="musica">
-    <div class="wrap split2">
+    <div class="wrap split2 music-split">
       <div>
         <h2>A música do seu espaço, <em>no mesmo app.</em></h2>
-        <p class="lede">O gerente conecta uma conta de streaming. A equipe comanda o som diretamente pelo app, cada um em seu próprio celular.</p>
+        <p class="lede">Conecte uma conta de streaming, e a equipe comanda o som pelo próprio celular, sem sair de perto do cliente.</p>
       </div>
-      <div class="viz" role="img" aria-label="Tocando Águas de Março, de Elis Regina, pedida pelo cliente Lucas. Na fila, uma música escolhida pelo Rafael. Botão para abaixar o volume e conversar.">
-        <div class="np">
-          <span class="art"></span>
-          <div><b>Águas de Março</b><small class="mut">Elis Regina</small><span class="who">pedida pelo cliente Lucas</span></div>
-          <span class="eq"><i></i><i></i><i></i><i></i></span>
+      <div class="mplayer" role="group" aria-label="Player de música do app, de exemplo">
+        <div class="mp-screen">
+          <div class="mp-cover" aria-hidden="true"><svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice"><use href="#mp-art"/></svg></div>
+          <div class="mp-side">
+            <div class="mp-top">
+              <span class="mp-ic" aria-hidden="true"><svg><use href="#i-down"/></svg></span>
+              <span class="mp-now"><span class="mp-eq" aria-hidden="true"><i></i><i></i><i></i></span>Tocando agora</span>
+              <button type="button" class="mp-chip mp-open" aria-expanded="false" aria-controls="mp-queue"><svg aria-hidden="true"><use href="#i-list"/></svg>Fila · <span class="mp-count">12</span></button>
+              <span class="mp-ic" aria-hidden="true"><svg><use href="#i-phones"/></svg></span>
+            </div>
+            <div class="mp-head">
+              <div class="mp-meta">
+                <b class="mp-title">Águas de Março</b>
+                <span class="mp-artist"><svg aria-hidden="true"><use href="#i-mic"/></svg>Elis Regina<svg class="mp-go" aria-hidden="true"><use href="#i-more"/></svg></span>
+                <span class="mp-album"><svg aria-hidden="true"><use href="#i-disc"/></svg>Elis &amp; Tom<svg class="mp-go" aria-hidden="true"><use href="#i-more"/></svg></span>
+                <span class="mp-by"><i class="mp-face" aria-hidden="true">LP</i><span class="mp-who">por Lucas</span><em class="mp-tag">Pedido de cliente</em></span>
+              </div>
+              <button type="button" class="mp-ic mp-fav" aria-pressed="false" aria-label="Favoritar"><svg aria-hidden="true"><use href="#i-heart"/></svg></button>
+            </div>
+            <div class="mp-prog">
+              <div class="mp-bar" aria-hidden="true"><i></i></div>
+              <span class="mp-at">1:14</span><span class="mp-left">-2:18</span>
+            </div>
+            <div class="mp-ctrl">
+              <button type="button" class="mp-ic mp-prev" aria-label="Anterior"><svg aria-hidden="true"><use href="#i-prev"/></svg></button>
+              <button type="button" class="mp-play" aria-label="Pausar"><svg aria-hidden="true"><use href="#i-pause"/></svg></button>
+              <button type="button" class="mp-ic mp-next" aria-label="Pular"><svg aria-hidden="true"><use href="#i-next"/></svg></button>
+            </div>
+            <div class="mp-out">
+              <span class="mp-speaker" title="Reproduzindo em Ana Lima">AL</span>
+              <label class="mp-vol"><svg aria-hidden="true"><use href="#i-vol"/></svg><span class="mp-sr">Volume</span><input type="range" min="0" max="100" value="58"></label>
+            </div>
+          </div>
+          <div class="mp-queue" id="mp-queue" hidden>
+            <div class="mp-qhead"><button type="button" class="mp-ic mp-close" aria-label="Voltar ao player"><svg aria-hidden="true"><use href="#i-back"/></svg></button><b>Fila</b></div>
+            <p class="mp-qlabel">Tocando agora</p>
+            <div class="mp-qnow"><svg class="mp-thumb" viewBox="0 0 100 100" aria-hidden="true"><use href="#mp-art"/></svg><span><b class="mp-qtitle">Águas de Março</b><small>Elis Regina</small></span><span class="mp-eq" aria-hidden="true"><i></i><i></i><i></i></span></div>
+            <p class="mp-qlabel">A seguir</p>
+            <ul class="mp-qlist"></ul>
+          </div>
         </div>
-        <div class="prog"><i></i></div>
-        <ul class="queue">
-          <li><span>Só Tinha de Ser Com Você</span><small>Rafael</small></li>
-          <li><span>Retrato em Branco e Preto</span><small>rádio da casa</small></li>
-        </ul>
-        <span class="talk">Abaixar para conversar</span>
       </div>
     </div>
     <div class="wrap">
       <div class="trio">
         <div><h3>Gerente</h3><p>Conecta uma conta de streaming em poucos toques.</p></div>
         <div><h3>Equipe</h3><p>Pausa, pula e põe música na fila pelo próprio celular.</p></div>
-        <div><h3>Cliente</h3><p>Quando faz uma reserva, o app pergunta se ele quer ouvir alguma música durante o atendimento. A música que o cliente escolheu entra automaticamente na fila assim que o atendimento é iniciado.</p></div>
+        <div><h3>Cliente</h3><p>Ao agendar, pode pedir uma música. Ela entra na fila quando o atendimento começa.</p></div>
       </div>
       <p class="aviso"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>Tocar música em ambiente comercial exige licença de execução pública do Ecad, que fica por conta do estabelecimento. A Prismo não fornece as músicas nem a licença.</p>
     </div>
   </section>
 
-  <div class="wrap divider" aria-hidden="true"></div>
-
-  <section id="avaliacoes">
-    <div class="wrap split2 flip">
-      <div>
-        <h2>Avaliações de quem <em>realmente foi atendido.</em></h2>
-        <p class="lede">Só avalia quem passou pelo atendimento no app, com o código lido no atendimento. Você responde, e todo mundo vê.</p>
-      </div>
-      <div class="viz" role="img" aria-label="Avaliação de 5 estrelas com selo de atendimento confirmado: Corte impecável, saí do jeito que pedi. Resposta do estabelecimento: Obrigado, até a próxima!">
-        <div class="rv">
-          <p class="viz-head"><span>Marina C.</span><span class="stars">★★★★★</span></p>
-          <span class="ok"><svg viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7"/></svg>Atendida em 26/11, corte com João</span>
-          <p class="quote">Corte impecável, saí do jeito que pedi.</p>
-          <div class="reply"><small>Resposta do Estúdio Alvorada</small>Obrigado, Marina! Até a próxima.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <div class="wrap divider" aria-hidden="true"></div>
-
   <section id="mais">
     <div class="wrap">
-      <h2>E mais o que <em>já vem no app.</em></h2>
-      <div class="more three">
-        <div><h3>Várias unidades</h3><p>Um app para a rede toda.</p></div>
-        <div><h3>Na tela de bloqueio</h3><p>O atendimento aparece na tela de bloqueio do cliente.</p></div>
-        <div><h3>Três idiomas</h3><p>Português, inglês e espanhol.</p></div>
+      <h2>O balcão e a equipe, <em>sob controle.</em></h2>
+      <p class="lede">O que hoje fica no caderno, no grupo da equipe e na planilha passa a ficar num lugar só, no celular ou no computador.</p>
+      <div class="feats">
+        <figure class="feat tall">
+          <div class="mini cal" aria-hidden="true">
+            <div class="cal-head"><span></span><b>João</b><b>Ana</b><b>Rafael</b></div>
+            <div class="cal-grid">
+              <div class="cal-hours"><span>9h</span><span>10h</span><span>11h</span><span>12h</span><span>13h</span><span>14h</span></div>
+              <div class="cal-col">
+                <i class="blk done" style="--r0:1;--rn:1">Ana<span> · Corte</span></i>
+                <i class="blk done" style="--r0:2;--rn:2">Bruno<span> · Corte e barba</span></i>
+                <i class="blk done" style="--r0:5;--rn:1">Carla<span> · Barba</span></i>
+                <i class="blk now" style="--r0:10;--rn:2">Lucas<span> · Corte e barba</span></i>
+              </div>
+              <div class="cal-col">
+                <i class="blk done" style="--r0:2;--rn:2">Paula<span> · Sobrancelha</span></i>
+                <i class="blk done" style="--r0:7;--rn:2">Diego<span> · Corte</span></i>
+                <i class="blk next" style="--r0:12;--rn:1">Marina<span> · Barba</span></i>
+              </div>
+              <div class="cal-col">
+                <i class="blk done" style="--r0:1;--rn:2">Igor<span> · Pigmentação</span></i>
+                <i class="blk free" style="--r0:6;--rn:3">livre</i>
+                <i class="blk next" style="--r0:12;--rn:1">Tiago<span> · Corte</span></i>
+              </div>
+              <span class="cal-now" style="--at:10.6"></span>
+            </div>
+          </div>
+          <figcaption><h3>A agenda da casa</h3><p>O dia da unidade inteira num olhar. No tablet ou no computador, uma coluna para cada profissional.</p></figcaption>
+        </figure>
+        <figure class="feat wide">
+          <div class="mini att" aria-hidden="true">
+            <p class="mini-head"><i></i>Precisa de atenção</p>
+            <div class="att-row">
+              <span><b class="num">2</b>pendentes</span>
+              <span><b class="num">R$ 85</b>a receber</span>
+              <span><b class="num">3</b>para renovar</span>
+            </div>
+          </div>
+          <figcaption><h3>Precisa de atenção</h3><p>Abriu o app, viu o que está esperando por você: atendimentos sem registro, valores a receber e planos para renovar.</p></figcaption>
+        </figure>
+        <figure class="feat wide">
+          <div class="mini day" aria-hidden="true">
+            <div class="day-row"><span><b class="num">3</b>a atender</span><span><b class="num">8</b>atendidas</span><span><b class="num">1</b>falta</span></div>
+            <div class="day-money">
+              <span>Já atendido<b class="num">R$ 412,00</b></span>
+              <span>Previsto<b class="num">R$ 590,00</b></span>
+              <i style="--w:70%"></i>
+            </div>
+          </div>
+          <figcaption><h3>O dia em números</h3><p>Quanto já entrou hoje, quanto ainda está previsto e quantos atendimentos faltam.</p></figcaption>
+        </figure>
+        <figure class="feat">
+          <div class="mini toast" aria-hidden="true">
+            <span class="tick"><svg viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7"/></svg></span>
+            <div><b>Encaixe registrado</b><small>Corte · R$ 55,00</small></div>
+          </div>
+          <figcaption><h3>Encaixe</h3><p>Chegou sem hora marcada? O atendimento fica registrado com serviço e valor, sem ocupar horário.</p></figcaption>
+        </figure>
+        <figure class="feat">
+          <div class="mini book" aria-hidden="true">
+            <p class="book-who"><svg viewBox="0 0 24 24"><path d="M6.6 3.5h2.6l1.4 4-1.9 1.3a12 12 0 0 0 6.5 6.5l1.3-1.9 4 1.4v2.6a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.6 5.7a2 2 0 0 1 2-2.2Z"/></svg>Marina Costa</p>
+            <b>Barba · quinta, 16:00</b>
+            <em>aguardando confirmação do cliente</em>
+          </div>
+          <figcaption><h3>Agendar para cliente</h3><p>Cliente ligou? Você marca por ele, e ele confirma pelo app.</p></figcaption>
+        </figure>
+        <figure class="feat">
+          <div class="mini clients" aria-hidden="true">
+            <p class="sorts"><span class="on">Mais gasto</span><span>Mais faltas</span></p>
+            <ul><li><span>Marina Costa</span><b class="num">R$ 1.240</b></li><li><span>Bruno Lima</span><b class="num">R$ 980</b></li><li><span>Lucas Prado</span><b class="num">R$ 760</b></li></ul>
+          </div>
+          <figcaption><h3>Clientes</h3><p>Quem vem mais, quem gasta mais e quem mais falta, com o histórico de cada um.</p></figcaption>
+        </figure>
+        <figure class="feat">
+          <div class="mini owe" aria-hidden="true">
+            <ul><li><span>Lucas · Corte<small>com João, ontem</small></span><b class="num">R$ 55</b></li><li><span>Bruno · Barba<small>com Ana, sábado</small></span><b class="num">R$ 30</b></li></ul>
+            <span class="owe-btn">Recebi no balcão</span>
+          </div>
+          <figcaption><h3>A receber</h3><p>Cada atendimento com valor em aberto, com o cliente, o serviço e quem atendeu.</p></figcaption>
+        </figure>
+        <figure class="feat">
+          <div class="mini hire" aria-hidden="true">
+            <span class="av">RS</span>
+            <div><b>Rafael Souza</b><small>Corte · Barba · Pigmentação</small></div>
+            <em>aceitou o convite</em>
+          </div>
+          <figcaption><h3>Contrate pelo app</h3><p>Convide o profissional pelo app e defina os serviços que ele faz e o horário dele.</p></figcaption>
+        </figure>
+        <figure class="feat">
+          <div class="mini comm" aria-hidden="true">
+            <div><span>Equipe</span><i style="--w:40%"></i><b class="num">40%</b></div>
+            <div class="hl"><span>Ana</span><i style="--w:45%"></i><b class="num">45%</b></div>
+          </div>
+          <figcaption><h3>Comissão de cada um</h3><p>Uma comissão para a equipe e outra para quem você quiser, calculada em cada atendimento.</p></figcaption>
+        </figure>
+        <figure class="feat wide">
+          <div class="mini days" aria-hidden="true">
+            <div class="strip">
+              <span><small>seg</small>16</span><span><small>ter</small>17</span><span><small>qua</small>18</span><span><small>qui</small>19</span><span class="hol"><small>sex</small>20</span><span><small>sáb</small>21</span><span class="shut"><small>dom</small>22</span>
+              <span><small>seg</small>23</span><span><small>ter</small>24</span><span class="off"><small>qua</small>25</span><span><small>qui</small>26</span><span><small>sex</small>27</span><span><small>sáb</small>28</span><span class="shut"><small>dom</small>29</span>
+            </div>
+            <p class="keys"><span class="k-hol">Feriado</span><span class="k-off">Folga da Ana</span><span class="k-shut">Fechado</span></p>
+          </div>
+          <figcaption><h3>Folgas e feriados</h3><p>Feriados, horários especiais e a folga de cada profissional, sem mudar a semana inteira.</p></figcaption>
+        </figure>
+        <figure class="feat wide">
+          <div class="mini views" aria-hidden="true">
+            <span><b>Cliente</b><small>Agendar</small></span>
+            <span><b>Profissional</b><small>Minha agenda</small></span>
+            <span class="on"><b>Gerente</b><small>A casa toda</small></span>
+          </div>
+          <figcaption><h3>Você também atende?</h3><p>Com a mesma conta, você entra como gerente, como profissional ou como cliente.</p></figcaption>
+        </figure>
+        <figure class="feat wide">
+          <ul class="mini log" aria-hidden="true">
+            <li><time class="num">14:32</time><b>Carla</b><span>Desconto aplicado · corte do Lucas</span></li>
+            <li><time class="num">11:05</time><b>Você</b><span>Serviço alterado · Barba, R$ 30 → R$ 35</span></li>
+            <li><time class="num">09:12</time><b>Carla</b><span>Folga declarada · Ana, dia 25</span></li>
+          </ul>
+          <figcaption><h3>Registro de alterações</h3><p>Quem mudou um preço, deu um desconto ou cancelou um horário, e quando.</p></figcaption>
+        </figure>
       </div>
     </div>
   </section>
-
   <div class="wrap divider" aria-hidden="true"></div>
 
   <section id="comecar">
     <div class="wrap">
-      <h2>Como <em>começa.</em></h2>
-      <ol class="steps start">
-        <li><div><b>Demonstração</b>Mostramos o app funcionando e montamos uma proposta para você.</div></li>
-        <li><div><b>Publicamos o seu app</b>Com a sua marca, na App Store e no Google Play.</div></li>
-        <li><div><b>Você cadastra o resto</b>Serviços, equipe e horários, pelo próprio app.</div></li>
+      <h2>Da demonstração <em>ao primeiro cliente agendando.</em></h2>
+      <p class="lede">Você não começa do zero: a Prismo publica o app com a sua marca e traz os dados do sistema que você usa hoje.</p>
+      <ol class="path" data-seq>
+        <li>
+          <span class="node" aria-hidden="true">1</span>
+          <div class="path-ui pu-demo" aria-hidden="true">
+            <p class="pu-when"><span class="pu-day"><small>qui</small>26</span><span><b>Demonstração</b><small>Prismo Booking · Estúdio Alvorada</small></span></p>
+            <p class="pu-doc"><span class="pu-file"></span><span><b>Proposta</b><small>feita para o seu negócio</small></span></p>
+          </div>
+          <h3>Veja funcionando</h3>
+          <p>Mostramos o app funcionando e montamos uma proposta para o seu negócio.</p>
+        </li>
+        <li>
+          <span class="node" aria-hidden="true">2</span>
+          <div class="path-ui pu-store" aria-hidden="true">
+            <div class="pu-app"><span class="pu-icon">EA</span><span><b>Estúdio Alvorada</b><small>Agende o seu horário</small></span><span class="pu-get">Obter</span></div>
+            <p class="pu-stores"><span>App Store</span><span>Google Play</span></p>
+          </div>
+          <h3>O seu app nas lojas</h3>
+          <p>Publicamos o app com o nome, o logo e as cores do seu negócio na App Store e no Google Play.</p>
+        </li>
+        <li>
+          <span class="node" aria-hidden="true">3</span>
+          <ul class="path-ui pu-check" aria-hidden="true">
+            <li><span class="pu-tick"><svg viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7"/></svg></span>Seus dados<small>importados</small></li>
+            <li><span class="pu-tick"><svg viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7"/></svg></span>Serviços e preços</li>
+            <li><span class="pu-tick"><svg viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7"/></svg></span>Equipe e horários</li>
+          </ul>
+          <h3>Tudo no lugar</h3>
+          <p>A Prismo importa os seus dados. Serviços, equipe e horários você ajusta pelo próprio app.</p>
+        </li>
+        <li>
+          <span class="node" aria-hidden="true">4</span>
+          <div class="path-ui pu-booked" aria-hidden="true">
+            <p class="pu-label">Próximo agendamento<span class="num">R$ 45,00</span></p>
+            <div class="pu-slot"><span class="pu-date"><small>qui</small>24<small>dez</small></span><span><b>Corte masculino</b><small>14:30 · com João Batista</small></span></div>
+          </div>
+          <h3>Clientes agendando</h3>
+          <p>Seus clientes baixam o app com o nome do seu negócio e marcam sozinhos.</p>
+        </li>
       </ol>
     </div>
   </section>
-
-  <div class="wrap divider" aria-hidden="true"></div>
 
   <section id="perguntas">
     <div class="wrap">
       <h2>Perguntas <em>frequentes.</em></h2>
       <div class="faq">
-        <details><summary>Já uso outro sistema de agendamento. Perco meus dados?</summary><p>Não. Peça a exportação dos dados ao seu sistema atual e nós fazemos a importação na Prismo. Tudo continua funcionando normalmente.</p></details>
-        <details><summary>Meu cliente precisa criar senha?</summary><p>Não precisa de senha nem e-mail, pois esses dados são fáceis de esquecer ou confundir. Ele entra com o número de WhatsApp e recebe o código de login por lá mesmo. Rápido e sem burocracia.</p></details>
-        <details><summary>Preciso de maquininha?</summary><p>Se você pretende receber os pagamentos diretamente através do app, não precisa, tudo é feito digitalmente. Para pagamentos físicos fora do app, você usa os meios de pagamento que já utiliza hoje, nada muda.</p></details>
-        <details><summary>Tenho mais de uma unidade. Funciona?</summary><p>Sim. Um único app funciona para toda a rede de estabelecimentos.</p></details>
+        <details><summary>Já uso outro sistema de agendamento. Perco meus dados?</summary><p>Não. Peça ao seu sistema atual uma exportação dos dados, e a Prismo faz a importação. Tudo continua funcionando.</p></details>
+        <details><summary>Meu cliente precisa criar senha?</summary><p>Não. Ele entra com o número do celular e recebe um código por SMS. Sem senha e sem e-mail para lembrar.</p></details>
+        <details><summary>Preciso de maquininha?</summary><p>Para receber pelo app, não: o cliente paga no Pix ou no cartão pelo celular. No balcão, você continua usando o que já usa hoje.</p></details>
+        <details><summary>Tenho mais de uma unidade. Funciona?</summary><p>Sim. Um app só atende a rede toda, e os relatórios mostram cada unidade ou a rede inteira.</p></details>
         <details><summary>Serve para o meu tipo de negócio?</summary><p>Serve para qualquer negócio que atende com hora marcada. O app ajusta o visual e a linguagem ao seu negócio: num salão, diz "a cabeleireira"; numa barbearia, "o barbeiro".</p></details>
       </div>
     </div>
   </section>
-
   <div class="wrap divider" aria-hidden="true"></div>
 
   <section id="contato" class="cta">
     <div class="wrap">
       <h2>Quer ver o app <em>com a sua marca?</em></h2>
       <p class="lede">Na demonstração, você vê o app funcionando e quanto custaria para o seu negócio.</p>
-      <a href="mailto:contato@prismo.studio?subject=Prismo%20Booking%3A%20quero%20uma%20demonstra%C3%A7%C3%A3o" class="btn btn-solid">contato@prismo.studio <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      <a href="mailto:contato@prismo.studio?subject=Prismo%20Booking%3A%20quero%20uma%20demonstra%C3%A7%C3%A3o" class="btn btn-solid">Pedir demonstração <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      <p class="mail">ou escreva para <a href="mailto:contato@prismo.studio">contato@prismo.studio</a></p>
     </div>
   </section>
 </main>
@@ -788,6 +1441,175 @@
 
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Escolher outro horário refaz o atendimento com ele: os passos seguintes tocam
+  // de novo, um depois do outro. (Quem conduz os passos é o story.js.)
+  const row = document.querySelector('.steps4');
+  row?.querySelectorAll('button.chip').forEach(chip => chip.addEventListener('click', () => {
+    if (chip.classList.contains('on')) return;
+    row.querySelectorAll('button.chip').forEach(c => {
+      const on = c === chip;
+      c.classList.toggle('on', on);
+      c.setAttribute('aria-pressed', on);
+    });
+    row.dispatchEvent(new CustomEvent('story:replay'));
+  }));
+
+  // Editor de marca ao vivo. Cada sugestão de cor tem a sua foto da tela real do
+  // editor; tocar numa cor (aqui ou no celular) mostra o toque e troca a tela na
+  // hora, como no app. Na rolagem, o story.js pede três toques de demonstração
+  // (data-beats); eles tocam um de cada vez, sem atropelar o anterior.
+  (function () {
+    const ed = document.querySelector('.editor');
+    if (!ed) return;
+    const shots = [...ed.querySelectorAll('.screen img')];
+    const picks = [...ed.querySelectorAll('.pick')];
+    const hits = [...ed.querySelectorAll('.hit')];
+    const tap = ed.querySelector('.tap');
+    const base = getComputedStyle(ed).getPropertyValue('--pick').trim() || '#4b6bd6';
+    const colour = k => k ? picks[k - 1].style.getPropertyValue('--c') : base;
+    const DEMO = [3, 2, 1], GAP = 700;
+    let cur = 0, z = 1, played = 0, want = 0, nextAt = 0, timer = 0, mine = false;
+
+    const show = (k, touch) => {
+      if (touch) {
+        tap.style.setProperty('--x', hits[k - 1].style.getPropertyValue('--x'));
+        tap.classList.remove('go'); void tap.offsetWidth; tap.classList.add('go');
+      }
+      if (k === cur) return;
+      const prev = shots[cur];
+      cur = k;
+      picks.forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.c === k)));
+      ed.style.setProperty('--pick', colour(k));
+      if (!k) { shots.forEach(i => i.classList.remove('on')); return; }
+      const img = shots[k];
+      img.style.zIndex = ++z;
+      img.classList.add('on');
+      // A tela anterior só sai depois que a nova cobriu tudo: sem piscar a do meio.
+      setTimeout(() => { if (prev !== shots[cur]) prev.classList.remove('on'); }, 180);
+    };
+
+    const pump = () => {
+      clearTimeout(timer);
+      if (mine) return;
+      if (played > want) { played = want; show(want ? DEMO[want - 1] : 0, false); return; }
+      if (played === want) return;
+      const wait = nextAt - performance.now();
+      if (wait > 0) { timer = setTimeout(pump, wait); return; }
+      show(DEMO[played++], true);
+      nextAt = performance.now() + GAP;
+      pump();
+    };
+
+    const choose = k => { mine = true; clearTimeout(timer); show(k, true); };
+    picks.forEach(b => b.addEventListener('click', () => choose(+b.dataset.c)));
+    hits.forEach(h => h.addEventListener('click', () => choose(+h.dataset.c)));
+    ed.addEventListener('story:beats', e => { want = e.detail.n; pump(); });
+
+    // Sem a narrativa (menos movimento pedido, ou sem suporte), a demonstração
+    // roda uma vez quando o editor aparece, se o movimento estiver liberado.
+    document.addEventListener('DOMContentLoaded', () => {
+      if (document.documentElement.classList.contains('story')) return;
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
+      const io = new IntersectionObserver(([e]) => {
+        if (!e.isIntersecting) return;
+        io.disconnect();
+        want = DEMO.length; nextAt = performance.now() + 600; pump();
+      }, { threshold: .6 });
+      io.observe(ed);
+    });
+  })();
+
+  // Player de música: toca, pausa, pula, volta, favorita, muda o volume e abre a
+  // fila, como o "Tocando agora" do app. O tempo só corre com o player na tela.
+  (function () {
+    const mp = document.querySelector('.mplayer');
+    if (!mp) return;
+    const $ = s => mp.querySelector(s);
+    const songs = [
+      { title: 'Águas de Março', len: 212, by: 'Lucas', face: 'LP', client: true },
+      { title: 'Só Tinha de Ser Com Você', len: 204, by: 'Rafael', face: 'RS' },
+      { title: 'Retrato em Branco e Preto', len: 189, radio: true },
+      { title: 'Corcovado', len: 163, radio: true },
+      { title: 'Triste', len: 202, by: 'Ana', face: 'AL' },
+    ];
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let at = 0, pos = 74, playing = true, seen = false, last = 0, raf = 0, fav = new Set();
+    const mmss = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+    const queueText = sg => sg.radio ? 'Rádio da casa' : `por ${sg.by}`;
+
+    const draw = () => {
+      const sg = songs[at];
+      $('.mp-at').textContent = mmss(pos);
+      $('.mp-left').textContent = `-${mmss(Math.max(0, sg.len - pos))}`;
+      $('.mp-bar i').style.setProperty('--p', `${(pos / sg.len * 100).toFixed(2)}%`);
+    };
+    const show = () => {
+      const sg = songs[at];
+      $('.mp-title').textContent = sg.title;
+      $('.mp-qtitle').textContent = sg.title;
+      $('.mp-face').textContent = sg.radio ? 'RC' : sg.face;
+      $('.mp-who').textContent = queueText(sg);
+      $('.mp-tag').hidden = !sg.client;
+      $('.mp-count').textContent = String(12 - at);
+      const f = $('.mp-fav');
+      f.setAttribute('aria-pressed', String(fav.has(at)));
+      f.setAttribute('aria-label', fav.has(at) ? 'Tirar das favoritas' : 'Favoritar');
+      $('.mp-qlist').innerHTML = [1, 2, 3].map(k => songs[(at + k) % songs.length]).map(n =>
+        `<li><svg class="mp-thumb" viewBox="0 0 100 100" aria-hidden="true"><use href="#mp-art"/></svg><span><b>${n.title}</b><small>Elis Regina · ${queueText(n)}</small></span>${n.client ? '<em class="mp-tag">Pedido de cliente</em>' : '<span></span>'}</li>`).join('');
+      draw();
+    };
+    const setPlaying = on => {
+      playing = on;
+      mp.classList.toggle('stopped', !on);
+      const b = $('.mp-play');
+      b.setAttribute('aria-label', on ? 'Pausar' : 'Tocar');
+      b.querySelector('use').setAttribute('href', on ? '#i-pause' : '#i-play');
+      loop();
+    };
+    const go = k => { at = (k + songs.length) % songs.length; pos = 0; show(); };
+    const step = t => {
+      raf = 0;
+      if (!playing || !seen || reduce) return;
+      if (last) pos += Math.min(1, (t - last) / 1000);
+      last = t;
+      if (pos >= songs[at].len) go(at + 1);
+      else draw();
+      raf = requestAnimationFrame(step);
+    };
+    const loop = () => { last = 0; if (!raf && playing && seen && !reduce) raf = requestAnimationFrame(step); };
+
+    $('.mp-play').addEventListener('click', () => setPlaying(!playing));
+    $('.mp-next').addEventListener('click', () => go(at + 1));
+    // Como no app: no começo da música, "Anterior" volta uma; depois, recomeça esta.
+    $('.mp-prev').addEventListener('click', () => { if (pos > 3) { pos = 0; draw(); } else go(at - 1); });
+    $('.mp-fav').addEventListener('click', () => { fav.has(at) ? fav.delete(at) : fav.add(at); show(); });
+    const vol = $('.mp-vol input');
+    vol.addEventListener('input', () => vol.style.setProperty('--v', `${vol.value}%`));
+    const queue = $('.mp-queue'), open = $('.mp-open');
+    const toggleQueue = on => {
+      queue.hidden = !on;
+      open.setAttribute('aria-expanded', String(on));
+      (on ? $('.mp-close') : open).focus({ preventScroll: true });
+    };
+    open.addEventListener('click', () => toggleQueue(true));
+    $('.mp-close').addEventListener('click', () => toggleQueue(false));
+    queue.addEventListener('keydown', e => { if (e.key === 'Escape') toggleQueue(false); });
+
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(([e]) => { seen = e.isIntersecting && e.intersectionRatio > .25; seen ? loop() : (cancelAnimationFrame(raf), raf = 0); },
+        { threshold: [0, .25, .5] }).observe(mp);
+    }
+    show();
+  })();
+
+  // Animações em laço só rodam enquanto a seção está na tela.
+  if ('IntersectionObserver' in window) {
+    const loops = new IntersectionObserver(entries => {
+      for (const e of entries) e.target.classList.toggle('paused', !e.isIntersecting);
+    });
+    document.querySelectorAll('.hero, #equipe, #musica').forEach(s => loops.observe(s));
+  }
 
   // QR ilustrativo: padrão fixo, não codifica nada.
   (function () {
@@ -827,6 +1649,157 @@
       [.9, 1, 1, .95, .8, .7, .75, .8, .7, .55, .3]
     ];
     document.getElementById('heat').innerHTML = occ.flat().map(v => `<span style="background:color-mix(in srgb, #e8b23a ${Math.round(v * 100)}%, #1c1c20)"></span>`).join('');
+  })();
+</script>
+<script>
+  // Prisma do topo: uma luz branca entra no prisma e sai em espectro sobre o celular.
+  // WebGL puro, ~30 fps, só enquanto o topo está na tela. Sem WebGL, fica a luz em CSS.
+  (function () {
+    const hero = document.querySelector('.hero'), phone = hero && hero.querySelector('.phone');
+    if (!hero || !phone) return;
+    const canvas = document.createElement('canvas');
+    canvas.className = 'prism-gl';
+    canvas.setAttribute('aria-hidden', 'true');
+    const gl = canvas.getContext('webgl', { alpha: false, antialias: false, depth: false, stencil: false, powerPreference: 'low-power' });
+    if (!gl) return;
+
+    const vs = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
+    const fs = `
+      precision highp float;
+      uniform vec2 uRes, uPrism;
+      uniform float uSize, uFlip, uRot, uInA, uOutA, uSpread, uTime, uFade, uDpr;
+      const vec3 BG = vec3(.0314, .0314, .0392);
+      vec3 spectrum(float t) {
+        t = clamp(t, 0., 1.) * 6.;
+        vec3 c = mix(vec3(1., .42, .42), vec3(1., .72, .42), clamp(t, 0., 1.));
+        c = mix(c, vec3(.96, .886, .478), clamp(t - 1., 0., 1.));
+        c = mix(c, vec3(.494, .878, .659), clamp(t - 2., 0., 1.));
+        c = mix(c, vec3(.42, .769, 1.), clamp(t - 3., 0., 1.));
+        c = mix(c, vec3(.604, .482, 1.), clamp(t - 4., 0., 1.));
+        return mix(c, vec3(.878, .482, 1.), clamp(t - 5., 0., 1.));
+      }
+      float seg(vec2 p, vec2 a, vec2 b, out float h) {
+        vec2 pa = p - a, ba = b - a; h = clamp(dot(pa, ba) / dot(ba, ba), 0., 1.); return length(pa - ba * h);
+      }
+      float tri(vec2 p, vec2 p0, vec2 p1, vec2 p2) {
+        vec2 e0 = p1 - p0, e1 = p2 - p1, e2 = p0 - p2, v0 = p - p0, v1 = p - p1, v2 = p - p2;
+        vec2 pq0 = v0 - e0 * clamp(dot(v0, e0) / dot(e0, e0), 0., 1.);
+        vec2 pq1 = v1 - e1 * clamp(dot(v1, e1) / dot(e1, e1), 0., 1.);
+        vec2 pq2 = v2 - e2 * clamp(dot(v2, e2) / dot(e2, e2), 0., 1.);
+        float s = sign(e0.x * e2.y - e0.y * e2.x);
+        vec2 d = min(min(vec2(dot(pq0, pq0), s * (v0.x * e0.y - v0.y * e0.x)),
+                         vec2(dot(pq1, pq1), s * (v1.x * e1.y - v1.y * e1.x))),
+                         vec2(dot(pq2, pq2), s * (v2.x * e2.y - v2.y * e2.x)));
+        return -sqrt(d.x) * sign(d.y);
+      }
+      float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+      void main() {
+        vec2 frag = vec2(gl_FragCoord.x, uRes.y - gl_FragCoord.y);
+        vec2 p = (frag - uPrism) / uSize; p.x *= uFlip;
+        float c = cos(uRot), s = sin(uRot);
+        p = vec2(c * p.x + s * p.y, -s * p.x + c * p.y);
+        vec2 A = vec2(0., -.5774), B = vec2(.5, .2887), C = vec2(-.5, .2887);
+        vec2 L = mix(A, C, .5), R = mix(A, B, .5);
+        vec3 col = BG;
+        float h, d;
+        // luz que entra
+        vec2 din = vec2(cos(uInA), sin(uInA));
+        d = seg(p, L - din * 14., L, h);
+        col += vec3(1., .985, .96) * (exp(-pow(d / .02, 2.)) * .22 + exp(-pow(d / .12, 2.)) * .04) * smoothstep(0., .85, h);
+        // dentro do vidro
+        d = seg(p, L, R, h);
+        col += vec3(1.) * exp(-pow(d / .035, 2.)) * .12;
+        // leque de cores que sai
+        vec2 q = p - R; float r = length(q);
+        float a = atan(q.y, q.x) - uOutA; a = mod(a + 3.14159265, 6.2831853) - 3.14159265;
+        float t = a / uSpread + .5;
+        float mask = smoothstep(0., .14, t) * smoothstep(1., .86, t);
+        float fall = smoothstep(0., .3, r) / (1. + r * .5);
+        float shimmer = 1. + .1 * sin(r * 2.2 - uTime * .8 + t * 4.);
+        col += spectrum(t) * mask * fall * shimmer * .65;
+        // vidro: aresta fina, mais clara em cima à esquerda, e um brilho suave dentro
+        float sd = tri(p, A, B, C), dp = sd * uSize / uDpr;
+        float glint = .2 + .6 * smoothstep(-.6, .6, -p.x - p.y * .7);
+        col += vec3(1.) * exp(-pow(dp / .9, 2.)) * glint * .6;
+        col += vec3(1.) * exp(-pow(max(dp, 0.) / 18., 2.)) * .018;
+        if (sd < 0.) col += mix(vec3(1.), spectrum(clamp(p.x + .5, 0., 1.)), .55) * .04 * (1.1 - p.y);
+        col = mix(BG, col, uFade) + (hash(frag + fract(uTime)) - .5) / 255.;
+        gl_FragColor = vec4(col, 1.);
+      }`;
+    const sh = (type, src) => { const o = gl.createShader(type); gl.shaderSource(o, src); gl.compileShader(o); return gl.getShaderParameter(o, gl.COMPILE_STATUS) ? o : null; };
+    const v = sh(gl.VERTEX_SHADER, vs), f = sh(gl.FRAGMENT_SHADER, fs);
+    if (!v || !f) return;
+    const prog = gl.createProgram();
+    gl.attachShader(prog, v); gl.attachShader(prog, f); gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return;
+    gl.useProgram(prog);
+    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+    const loc = gl.getAttribLocation(prog, 'p');
+    gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+    const U = {};
+    ['uRes', 'uPrism', 'uSize', 'uFlip', 'uRot', 'uInA', 'uOutA', 'uSpread', 'uTime', 'uFade', 'uDpr'].forEach(n => U[n] = gl.getUniformLocation(prog, n));
+
+    const deg = Math.PI / 180, reduce = matchMedia('(prefers-reduced-motion: reduce)');
+    let L = null, mx = 0, my = 0, tx = 0, ty = 0, visible = true, raf = 0, last = 0;
+    const layout = () => {
+      const dpr = Math.min(devicePixelRatio || 1, 1.5);
+      const hr = hero.getBoundingClientRect(), pr = phone.getBoundingClientRect();
+      canvas.width = Math.round(hr.width * dpr); canvas.height = Math.round(hr.height * dpr);
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      const px = pr.left - hr.left, py = pr.top - hr.top, wide = hr.width > 900;
+      // Desktop: prisma à esquerda do celular, luz vindo de cima. Celular: prisma logo
+      // acima do celular, espelhado, luz vindo da direita.
+      const size = wide ? Math.max(90, Math.min(140, pr.width * .4)) : 72;
+      const flip = wide ? 1 : -1;
+      const cx = wide ? px - size * .6 : px + pr.width * .8;
+      const cy = wide ? py + pr.height * .06 : py - size * .55;
+      const target = wide ? [px + pr.width * .1, py + pr.height * .5] : [px + pr.width * .3, py + pr.height * .3];
+      const aim = Math.atan2(target[1] - cy, (target[0] - cx) * flip);
+      const rot = aim - 35 * deg;
+      L = { dpr, size, flip, cx, cy, rot, out: 35 * deg, inA: (wide ? 62 : 22) * deg - rot };
+    };
+    const draw = time => {
+      if (!L) layout();
+      tx += (mx - tx) * .06; ty += (my - ty) * .06;
+      const hh = hero.offsetHeight, sc = Math.min(1, Math.max(0, scrollY / hh));
+      gl.uniform2f(U.uRes, canvas.width, canvas.height);
+      gl.uniform2f(U.uPrism, L.cx * L.dpr, L.cy * L.dpr);
+      gl.uniform1f(U.uSize, L.size * L.dpr);
+      gl.uniform1f(U.uFlip, L.flip);
+      gl.uniform1f(U.uRot, L.rot + sc * 10 * deg);
+      gl.uniform1f(U.uInA, L.inA + tx * 4 * deg);
+      gl.uniform1f(U.uOutA, L.out + tx * 3 * deg);
+      gl.uniform1f(U.uSpread, (36 + ty * 4) * deg);
+      gl.uniform1f(U.uTime, time / 1000);
+      gl.uniform1f(U.uFade, 1 - sc * .7);
+      gl.uniform1f(U.uDpr, L.dpr);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    };
+    const tick = time => {
+      raf = 0;
+      if (!visible || document.hidden || reduce.matches) return;
+      if (time - last > 32) { last = time; draw(time); }
+      raf = requestAnimationFrame(tick);
+    };
+    const start = () => { if (!raf && visible && !document.hidden && !reduce.matches) raf = requestAnimationFrame(tick); };
+
+    hero.prepend(canvas);
+    layout(); draw(0);
+    requestAnimationFrame(() => hero.classList.add('gl'));
+    start();
+
+    new ResizeObserver(() => { layout(); draw(performance.now()); }).observe(hero);
+    phone.querySelector('img')?.addEventListener('load', () => { layout(); draw(performance.now()); });
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; start(); }).observe(hero);
+    document.addEventListener('visibilitychange', start);
+    reduce.addEventListener?.('change', () => { draw(performance.now()); start(); });
+    addEventListener('pointermove', e => {
+      if (e.pointerType !== 'mouse') return;
+      mx = e.clientX / innerWidth * 2 - 1; my = e.clientY / innerHeight * 2 - 1;
+    }, { passive: true });
+    addEventListener('scroll', () => { if (reduce.matches) return; start(); }, { passive: true });
+    canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); hero.classList.remove('gl'); cancelAnimationFrame(raf); raf = 0; });
   })();
 </script>
 </body>
