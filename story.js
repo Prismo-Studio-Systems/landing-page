@@ -7,9 +7,11 @@
 // e só então o seguinte começa. Quando a cena não cabe na tela, uma "câmera" sobe
 // o conteúdo entre uma peça e outra, e o que passa do topo some sob o menu. No fim,
 // tudo sai para cima e só então a cena seguinte começa a entrar, presa no mesmo lugar.
+// Rolando para cima, o que já entrou fica na tela: nada refaz a entrada. A cena só
+// apaga, inteira, na volta para a cena anterior, que divide com ela a mesma tela.
 //
 // Uma peça com data-beats="n" ganha n "toques" depois de entrar: a cada um, ela
-// recebe o evento story:beats com quantos toques a rolagem já pediu.
+// recebe o evento story:beats com quantos toques a rolagem já pediu (o número só cresce).
 //
 // Sem JavaScript ou com pedido de menos movimento, nada disso liga: a página fica
 // em fluxo normal, com tudo visível.
@@ -58,7 +60,7 @@
     '.cal-head', '.cal-col .blk', '.cal-now', '.mini-head', '.att-row > span', '.day-row > span', '.day-money',
     '.toast > *', '.book > *', '.sorts', '.clients li', '.owe li', '.owe-btn', '.hire > *', '.comm > div',
     '.strip > span', '.keys', '.views > span', '.log li',
-    '.editor .phone', '.editor h3', '.editor .lede', '.editor .picks-label', '.editor .picks', 'figcaption',
+    '.editor .phone', '.editor h3', '.editor .lede', '.editor .ctl', 'figcaption',
     '.product-name', '.showcase h3', '.showcase .lede', '.tags li', '.showcase .btn', '.fan .phone',
   ].join(',');
 
@@ -222,7 +224,6 @@
   // A troca de estilos: o celular aparece e a tela passa pelos outros estilos.
   const morph = (el, t) => {
     const figs = [...el.children];
-    setVar(el, '--r', smooth(clamp01(t / .16)), '_r');
     const w = figs.map((_, k) => k === 0 ? 1 : clamp01((t - (.18 + (k - 1) * .27)) / .22));
     figs.forEach((f, k) => {
       if (k) {
@@ -249,31 +250,49 @@
     const y0 = sc.base - camAt(sc.keys, s);
     sc.inner.style.transform = `translate3d(0, ${y0.toFixed(1)}px, 0)`;
     const xt = sc.last ? 0 : clamp01((s - sc.exitA) / (EXIT * sc.vh * SPEED));
+    // O que já foi revelado fica revelado: rolando para cima, nada se esconde de
+    // novo nem refaz a entrada. Na troca de cena para trás, as duas cenas, que
+    // dividem a mesma tela, só se apagam e se acendem inteiras, com tudo no lugar:
+    // a de baixo apaga nos últimos passos antes do começo dela (a primeira cena não
+    // divide a tela, desce junto com a página); a de cima, que tinha saído por
+    // inteiro, volta acesa em vez de refazer a saída peça por peça. Na primeira
+    // passagem, nada disso aparece: a cena fica acesa e as peças entram e saem.
+    const F = EXIT * sc.vh * SPEED;
+    sc.smax = Math.max(sc.smax || 0, s);
+    if (xt >= 1) sc.gone = true;
+    else if (xt <= 0) sc.gone = false;
+    const fade = (sc.first ? 1 : clamp01(s / Math.max(1, Math.min(F, sc.smax)))) * (sc.gone ? 1 - xt : 1);
+    setVar(sc.inner, 'opacity', fade, '_o');
     const n = sc.items.length;
     sc.items.forEach((it, idx) => {
-      const t = clamp01((s - it.a) / (it.e - it.a));
-      if (it.kind === 'morph') morph(it.el, t);
-      else setVar(it.el, '--r', smooth(clamp01(it.parts.length ? t / .45 : t)), '_r');
+      const now = clamp01((s - it.a) / (it.e - it.a));
+      const t = it.lt = Math.max(it.lt || 0, now);
+      // A troca de estilos não é uma entrada: ela acompanha a rolagem nos dois sentidos.
+      if (it.kind === 'morph') morph(it.el, now);
+      const r = it.kind === 'morph' ? t / .16 : it.parts.length ? t / .45 : t;
+      setVar(it.el, '--r', smooth(clamp01(r)), '_r');
       for (const p of it.parts) setVar(p.el, '--r', outCubic(clamp01((t - p.s) / p.l)), '_r');
       // Sai na hora certa: no fim da cena, em cascata; ou antes, se a câmera o empurrar
       // para cima. A peça alta só sai quando o pé dela chega lá em cima.
       const ref = it.tall ? it.top + it.h - 200 : it.top;
       const pushed = clamp01((sc.padTop - EDGE_TOL - (y0 + ref)) / (Math.min(it.h, 200) * .5 + 1));
-      const x = Math.max(clamp01((xt - idx / n * .5) / .5), pushed);
+      const x = Math.max(sc.gone ? 0 : clamp01((xt - idx / n * .5) / .5), pushed);
       setVar(it.el, '--x', smooth(x), '_x');
       // O gesto do passo (escolher, ler, aceitar, pagar) só começa depois que ele entrou.
       if (it.steps) {
-        const act = Math.min(clamp01((s - it.e) / (it.t - it.e)), replayAt(it.k));
+        it.la = Math.max(it.la || 0, clamp01((s - it.e) / (it.t - it.e)));
+        const act = Math.min(it.la, replayAt(it.k));
         setVar(it.el, '--a', act, '_a');
         setVar(it.el, '--d', Math.sin(Math.PI * act), '_d');
       }
       // Toques de demonstração: a página decide o que cada um faz e toca um de cada vez.
       if (it.beats) {
-        const n = Math.max(0, Math.min(it.beats, Math.floor((s - it.e) / ((it.t - it.e) / it.beats) + .75)));
+        const n = Math.max(it.n || 0, Math.min(it.beats, Math.floor((s - it.e) / ((it.t - it.e) / it.beats) + .75)));
         if (n !== it.n) { it.n = n; it.el.dispatchEvent(new CustomEvent('story:beats', { detail: { n } })); }
       }
     });
-    setVar(sc.inner, '--sp', clamp01(s / sc.exitA), '_sp');
+    sc.sp = Math.max(sc.sp || 0, clamp01(s / sc.exitA));
+    setVar(sc.inner, '--sp', sc.sp, '_sp');
   };
 
   // Outro horário escolhido: os passos seguintes refazem o gesto, um depois do outro.

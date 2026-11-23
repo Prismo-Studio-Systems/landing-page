@@ -112,41 +112,80 @@
   .styles figure:nth-child(even) { margin-top: 3rem; }
   .styles figcaption { font-size: .92rem; color: var(--muted); }
   .styles figcaption b { display: block; font-family: var(--serif); font-weight: 400; font-size: 1.3rem; }
-  .editor { display: grid; grid-template-columns: auto minmax(0, 30rem); justify-content: center; gap: clamp(2rem, 7vw, 6rem); align-items: center; margin-top: 4.5rem; padding: clamp(2rem, 5vw, 3.5rem); border-radius: 28px; border: 1px solid var(--line); background: radial-gradient(circle at 0% 0%, #9a7bff17, transparent 55%), var(--surface); position: relative; overflow: hidden; }
+  /* Editor ao vivo: para cada combinação de estilo, foto e cores, a tela inicial
+     real do app (telas/marca/). Tocar num controle troca a tela na hora; trocar de
+     estilo passa a mesma cortina de espectro da seção de estilos. */
+  @property --pick { syntax: "<color>"; inherits: true; initial-value: #c8a45c; }
+  @property --pick2 { syntax: "<color>"; inherits: true; initial-value: #e89383; }
+  .editor {
+    --pick: #c8a45c; --pick2: #e89383; --ir: 37px;
+    display: grid; grid-template-columns: auto minmax(0, 30rem); grid-template-rows: 1fr auto auto 1fr;
+    justify-content: center; column-gap: clamp(2rem, 6vw, 5.5rem);
+    margin-top: 4.5rem; padding: clamp(2rem, 5vw, 3.5rem); border-radius: 28px; border: 1px solid var(--line);
+    background: radial-gradient(circle at 0% 0%, #9a7bff17, transparent 55%), var(--surface);
+    position: relative; overflow: hidden;
+    transition: --pick .7s var(--ease), --pick2 .7s var(--ease);
+  }
   .editor::before { content: ""; position: absolute; inset: 0 0 auto; height: 1px; background: var(--spectrum); }
-  .editor h3 { font-size: clamp(1.8rem, 3vw, 2.4rem); }
-
-  /* Editor ao vivo: a tela real do editor, com uma foto por sugestão de cor.
-     Tocar numa cor (aqui ou no celular) troca a foto na hora, como no app. */
-  @property --pick { syntax: "<color>"; inherits: true; initial-value: #4b6bd6; }
-  .editor { --pick: #4b6bd6; transition: --pick .7s var(--ease); }
+  /* A luz atrás do celular acompanha as duas cores, como a névoa do app. */
   .editor::after {
     content: ""; position: absolute; z-index: 0; inset: 0; pointer-events: none;
-    background: radial-gradient(38% 55% at 24% 60%, color-mix(in srgb, var(--pick) 22%, transparent), transparent 72%);
+    background:
+      radial-gradient(30% 42% at 20% 34%, color-mix(in srgb, var(--pick) 26%, transparent), transparent 72%),
+      radial-gradient(30% 42% at 26% 80%, color-mix(in srgb, var(--pick2) 20%, transparent), transparent 72%);
   }
   .editor > * { position: relative; z-index: 1; }
-  .editor .phone { width: min(290px, calc((100svh - 17rem) * .46)); }
-  .preview .screen { position: relative; }
-  .preview .screen img + img { position: absolute; inset: 0; opacity: 0; transition: opacity .14s linear; }
-  .preview .screen img.on { opacity: 1; }
-  /* Os toques caem onde ficam as sugestões na tela (390 × 844). */
-  .preview .hit, .preview .tap { position: absolute; top: 88.27%; left: calc(var(--x) * 1%); width: 11%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; }
-  .preview .hit { z-index: 9; cursor: pointer; }
-  .preview .tap { z-index: 10; pointer-events: none; opacity: 0; background: #ffffff; }
-  .preview .tap.go { animation: tap .6s cubic-bezier(.2, .7, .3, 1) both; }
-  @keyframes tap { 0% { opacity: .5; scale: .35; } 25% { opacity: .38; scale: .8; } 100% { opacity: 0; scale: 1.7; } }
-  .picks-label { margin-top: 2rem; font-size: .85rem; color: var(--muted); }
-  .picks { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: .7rem; }
-  .pick {
-    width: 2.75rem; height: 2.75rem; border-radius: 50%; cursor: pointer;
-    border: 2px solid transparent; background: var(--c); background-clip: content-box; padding: 4px;
-    transition: border-color .25s, scale .25s var(--ease);
+  .editor h3 { font-size: clamp(1.8rem, 3vw, 2.4rem); }
+  .editor h3 em { color: color-mix(in oklab, var(--pick) 62%, var(--text)); }
+  .editor .phone { grid-column: 1; grid-row: 1 / -1; align-self: center; width: min(290px, calc((100svh - 17rem) * .46)); }
+  .ed-head { grid-column: 2; grid-row: 2; }
+  .ed-ctl { grid-column: 2; grid-row: 3; display: grid; gap: 1.3rem; margin-top: 2.1rem; }
+
+  .preview .screen { position: relative; aspect-ratio: 390 / 844; border-radius: var(--ir); overflow: hidden; background: #000; isolation: isolate; }
+  .preview .screen img { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 0; }
+  .preview .band {
+    position: absolute; inset: 0; z-index: 9; pointer-events: none; opacity: 0; mix-blend-mode: screen;
+    background: linear-gradient(90deg, transparent 84%, #ff6b6b90 87%, #f5e27a90 90%, #7ee0a890 93%, #6bc4ff90 96%, #e07bffa0 99.4%, transparent);
+  }
+
+  .ctl { display: grid; gap: .6rem; }
+  .ctl-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: .2rem .7rem; font-size: .85rem; color: var(--text); }
+  .ctl-note { font-size: .8rem; color: var(--muted); }
+  .ctl-note:empty { display: none; }
+  .ctl.off .seg, .ctl.off .photos, .ctl.off .sws { opacity: .42; }
+  .ctl.off:hover .photos, .ctl.off:hover .sws { opacity: .7; }
+  .ctl button {
+    position: relative; font: inherit; color: inherit; cursor: pointer;
     -webkit-tap-highlight-color: transparent;
   }
-  .pick:hover { scale: 1.08; }
-  .pick:active { scale: .92; }
-  .pick[aria-pressed="true"] { border-color: var(--text); }
-  .editor h3 em { color: color-mix(in oklab, var(--pick) 62%, var(--text)); }
+  /* O toque: um anel que abre e some, no botão tocado (pela pessoa ou pela demonstração). */
+  .ctl button.press::after {
+    content: ""; position: absolute; inset: -5px; border-radius: inherit; pointer-events: none;
+    border: 1.5px solid var(--text); animation: press .6s cubic-bezier(.2, .7, .3, 1) both;
+  }
+  @keyframes press { from { opacity: .8; scale: .82; } to { opacity: 0; scale: 1.18; } }
+
+  .seg { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; padding: 4px; border-radius: 999px; border: 1px solid var(--line); background: #ffffff05; transition: opacity .3s; }
+  .seg button { border: 0; border-radius: 999px; padding: .55rem .35rem; background: transparent; color: var(--muted); font-size: .88rem; white-space: nowrap; transition: color .25s, background-color .3s var(--ease); }
+  .seg button:hover { color: var(--text); }
+  .seg button[aria-pressed="true"] { background: var(--text); color: var(--bg); font-weight: 400; }
+
+  .photos { display: flex; gap: .7rem; transition: opacity .3s; }
+  .photos button { width: 3.5rem; aspect-ratio: 4 / 5; padding: 0; border: 0; border-radius: 12px; background: #000; box-shadow: 0 0 0 1px var(--line); transition: box-shadow .25s, scale .25s var(--ease); }
+  .photos img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
+  .photos button:hover { scale: 1.05; }
+  .photos button[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--surface), 0 0 0 3.5px var(--text); }
+
+  .sws { display: flex; flex-wrap: wrap; gap: .6rem; transition: opacity .3s; }
+  .sw {
+    width: 2.6rem; height: 2.6rem; border-radius: 50%; padding: 4px;
+    border: 2px solid transparent; background: var(--c); background-clip: content-box;
+    transition: border-color .25s, scale .25s var(--ease), background-color .5s var(--ease);
+  }
+  .sw:hover { scale: 1.08; }
+  .sw:active, .photos button:active { scale: .92; }
+  .sw[aria-pressed="true"] { border-color: var(--text); }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
   /* Fluxo */
   .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; margin-top: 4rem; }
@@ -211,14 +250,15 @@
   }
   @media (max-width: 900px) {
     nav ul { display: none; }
-    .hero-grid, .split, .split.flip, .price-box, .editor { grid-template-columns: minmax(0, 1fr); }
+    .hero-grid, .split, .split.flip, .price-box { grid-template-columns: minmax(0, 1fr); }
     /* Celular: o texto ocupa a primeira tela inteira, com o aviso de rolar no pé; o celular vem logo abaixo. */
     .hero { display: block; padding: 0 0 4rem; }
     .hero-grid { gap: 0; }
     .hero-grid > div:first-child { min-height: 100svh; display: flex; flex-direction: column; justify-content: center; padding: 5.5rem 0 6.5rem; }
     .hero .phone { width: min(280px, 76vw); margin-top: 3rem; }
     .split.flip > .phones, .split.flip > .phone { order: 0; }
-    .split > .phone, .split > .phones, .editor .phone { justify-self: center; }
+    .split > .phone, .split > .phones { justify-self: center; }
+    .editor .phone { width: min(250px, calc((100svh - 17rem) * .46)); }
   }
   @media (max-width: 600px) {
     .phones { justify-content: center; }
@@ -237,6 +277,21 @@
     .phone.land { padding: 6px; border-radius: 26px; }
     .phone.land img { border-radius: 21px; }
     header .btn { display: none; }
+    /* Editor no celular: o texto em cima e, embaixo, o celular ao lado dos controles,
+       para a tela mudar à vista de quem toca. */
+    .editor { --ir: 21px; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); grid-template-rows: auto auto; column-gap: .85rem; padding: 1.6rem 1rem 1.25rem; border-radius: 22px; }
+    .ed-head { grid-column: 1 / -1; grid-row: 1; margin-bottom: 1.5rem; }
+    .editor .phone { grid-row: 2; align-self: start; width: 100%; padding: 6px; border-radius: 27px; }
+    .ed-ctl { grid-row: 2; grid-column: 2; align-content: start; gap: .95rem; margin-top: 0; }
+    .ctl { gap: .4rem; }
+    .ctl-head { font-size: .78rem; }
+    .ctl-note { flex-basis: 100%; font-size: .76rem; line-height: 1.35; }
+    .seg { grid-template-columns: 1fr 1fr; border-radius: 14px; padding: 3px; }
+    .seg button { border-radius: 10px; padding: .42rem .15rem; font-size: .76rem; }
+    .photos { gap: .35rem; }
+    .photos button { flex: 1 1 0; width: auto; min-width: 0; border-radius: 8px; }
+    .sws { gap: .3rem; }
+    .sw { width: 2.3rem; height: 2.3rem; padding: 3px; }
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
@@ -945,30 +1000,56 @@
       </div>
       </div>
 
-      <div class="editor" data-beats="3">
-        <div class="phone preview" role="img" aria-label="Editor de marca do app: a prévia da tela do cliente no topo, a cor principal dourada, a segunda cor e as sugestões de segunda cor. A prévia muda conforme a cor escolhida.">
+      <div class="editor" data-beats="4">
+        <div class="phone preview">
           <div class="screen">
-            <img src="telas/marca.webp" width="390" height="844" loading="lazy" alt="">
-            <img src="telas/marca-1.webp" width="390" height="844" loading="lazy" alt="">
-            <img src="telas/marca-2.webp" width="390" height="844" loading="lazy" alt="">
-            <img src="telas/marca-3.webp" width="390" height="844" loading="lazy" alt="">
-            <img src="telas/marca-4.webp" width="390" height="844" loading="lazy" alt="">
-            <img src="telas/marca-5.webp" width="390" height="844" loading="lazy" alt="">
-            <span class="hit" style="--x:9.49" data-c="1"></span><span class="hit" style="--x:29.74" data-c="2"></span><span class="hit" style="--x:50" data-c="3"></span><span class="hit" style="--x:70.26" data-c="4"></span><span class="hit" style="--x:90.51" data-c="5"></span>
-            <span class="tap"></span>
+            <img src="telas/marca/cartao-barbearia-dourado-1.webp" width="390" height="844" alt="Tela inicial do app no estilo Cartão, com a foto da barbearia, em dourado e coral.">
+            <span class="band" aria-hidden="true"></span>
           </div>
         </div>
-        <div>
-          <h3>Mude uma cor e <em>veja na hora.</em></h3>
-          <p class="lede">Cores, fotos, fonte e estilo: você mesmo ajusta, e a prévia mostra o app do cliente mudando antes de salvar.</p>
-          <p class="picks-label" id="picks-label">Experimente uma das sugestões de segunda cor:</p>
-          <div class="picks" role="group" aria-labelledby="picks-label">
-            <button type="button" class="pick" style="--c:#8cb477" data-c="1" aria-pressed="false" aria-label="Verde"></button>
-            <button type="button" class="pick" style="--c:#e89383" data-c="2" aria-pressed="false" aria-label="Coral"></button>
-            <button type="button" class="pick" style="--c:#62b6bd" data-c="3" aria-pressed="false" aria-label="Turquesa"></button>
-            <button type="button" class="pick" style="--c:#71b1d4" data-c="4" aria-pressed="false" aria-label="Azul-claro"></button>
-            <button type="button" class="pick" style="--c:#8da9e1" data-c="5" aria-pressed="false" aria-label="Lavanda"></button>
+        <div class="ed-head">
+          <h3>Experimente a sua marca <em>no app.</em></h3>
+          <p class="lede">Troque o estilo, a foto e as cores e veja a tela inicial que o cliente recebe. No app, você mesmo muda tudo isso e confere a prévia antes de salvar.</p>
+        </div>
+        <div class="ed-ctl">
+          <div class="ctl" role="group" aria-labelledby="ctl-style">
+            <p class="ctl-head"><span id="ctl-style">Estilo</span></p>
+            <div class="seg">
+              <button type="button" data-style="cartao" aria-pressed="true">Cartão</button>
+              <button type="button" data-style="capa" aria-pressed="false">Capa</button>
+              <button type="button" data-style="brutal" aria-pressed="false">Brutalista</button>
+              <button type="button" data-style="deco" aria-pressed="false">Art déco</button>
+            </div>
           </div>
+          <div class="ctl" role="group" aria-labelledby="ctl-photo" data-ctl="photo">
+            <p class="ctl-head"><span id="ctl-photo">Foto do espaço</span> <span class="ctl-note" data-on="" data-off="O Art déco não leva foto na tela inicial."></span></p>
+            <div class="photos">
+              <button type="button" data-photo="barbearia" aria-pressed="true" aria-label="Barbearia"><img src="telas/marca/foto-barbearia.webp" width="144" height="180" alt=""></button>
+              <button type="button" data-photo="salao" aria-pressed="false" aria-label="Salão"><img src="telas/marca/foto-salao.webp" width="144" height="180" alt=""></button>
+              <button type="button" data-photo="estetica" aria-pressed="false" aria-label="Clínica de estética"><img src="telas/marca/foto-estetica.webp" width="144" height="180" alt=""></button>
+              <button type="button" data-photo="tatuagem" aria-pressed="false" aria-label="Estúdio de tatuagem"><img src="telas/marca/foto-tatuagem.webp" width="144" height="180" alt=""></button>
+            </div>
+          </div>
+          <div class="ctl" role="group" aria-labelledby="ctl-primary">
+            <p class="ctl-head"><span id="ctl-primary">Cor principal</span></p>
+            <div class="sws">
+              <button type="button" class="sw" style="--c:#c8a45c" data-primary="dourado" aria-pressed="true" aria-label="Dourado"></button>
+              <button type="button" class="sw" style="--c:#e07a5f" data-primary="coral" aria-pressed="false" aria-label="Coral"></button>
+              <button type="button" class="sw" style="--c:#2e9e78" data-primary="esmeralda" aria-pressed="false" aria-label="Esmeralda"></button>
+              <button type="button" class="sw" style="--c:#8b6cf0" data-primary="violeta" aria-pressed="false" aria-label="Violeta"></button>
+              <button type="button" class="sw" style="--c:#d9668f" data-primary="rosa" aria-pressed="false" aria-label="Rosa"></button>
+              <button type="button" class="sw" style="--c:#4b7be5" data-primary="azul" aria-pressed="false" aria-label="Azul"></button>
+            </div>
+          </div>
+          <div class="ctl" role="group" aria-labelledby="ctl-second" data-ctl="second">
+            <p class="ctl-head"><span id="ctl-second">Segunda cor</span> <span class="ctl-note" data-on="Sugestões do app para a cor principal." data-off="Aparece no fundo do estilo Cartão.">Sugestões do app para a cor principal.</span></p>
+            <div class="sws">
+              <button type="button" class="sw" style="--c:#e89383" data-second="1" aria-pressed="true" aria-label="Coral"></button>
+              <button type="button" class="sw" style="--c:#62b6bd" data-second="2" aria-pressed="false" aria-label="Turquesa"></button>
+              <button type="button" class="sw" style="--c:#8da9e1" data-second="3" aria-pressed="false" aria-label="Lavanda"></button>
+            </div>
+          </div>
+          <p class="sr" aria-live="polite"></p>
         </div>
       </div>
     </div>
@@ -1455,65 +1536,172 @@
     row.dispatchEvent(new CustomEvent('story:replay'));
   }));
 
-  // Editor de marca ao vivo. Cada sugestão de cor tem a sua foto da tela real do
-  // editor; tocar numa cor (aqui ou no celular) mostra o toque e troca a tela na
-  // hora, como no app. Na rolagem, o story.js pede três toques de demonstração
-  // (data-beats); eles tocam um de cada vez, sem atropelar o anterior.
+  // Editor de marca ao vivo. Para cada combinação de estilo, foto e cores há uma
+  // foto real da tela inicial do app (telas/marca/); tocar num controle troca a
+  // tela na hora, e trocar de estilo passa uma cortina. Na rolagem, o story.js
+  // pede quatro toques de demonstração (data-beats), um de cada vez; quem toca
+  // num controle assume, e a demonstração para.
   (function () {
     const ed = document.querySelector('.editor');
     if (!ed) return;
-    const shots = [...ed.querySelectorAll('.screen img')];
-    const picks = [...ed.querySelectorAll('.pick')];
-    const hits = [...ed.querySelectorAll('.hit')];
-    const tap = ed.querySelector('.tap');
-    const base = getComputedStyle(ed).getPropertyValue('--pick').trim() || '#4b6bd6';
-    const colour = k => k ? picks[k - 1].style.getPropertyValue('--c') : base;
-    const DEMO = [3, 2, 1], GAP = 700;
-    let cur = 0, z = 1, played = 0, want = 0, nextAt = 0, timer = 0, mine = false;
+    const screen = ed.querySelector('.screen');
+    const band = ed.querySelector('.band');
+    const live = ed.querySelector('.sr');
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // Cada cor principal com três das sugestões de segunda cor que o app dá para ela.
+    const PRIMARY = {
+      dourado: ['#c8a45c', [['#e89383', 'coral'], ['#62b6bd', 'turquesa'], ['#8da9e1', 'lavanda']]],
+      coral: ['#e07a5f', [['#b9911d', 'mostarda'], ['#0ea996', 'verde-água'], ['#cb7bba', 'orquídea']]],
+      esmeralda: ['#2e9e78', [['#0c99bb', 'azul-piscina'], ['#8883d6', 'lavanda'], ['#c771a1', 'malva']]],
+      violeta: ['#8b6cf0', [['#008bc8', 'azul'], ['#d35499', 'magenta'], ['#c76a00', 'laranja']]],
+      rosa: ['#d9668f', [['#d47319', 'laranja'], ['#a177e1', 'lilás'], ['#009e88', 'verde-água']]],
+      azul: ['#4b7be5', [['#008ca1', 'petróleo'], ['#b05fc3', 'roxo'], ['#bf6a00', 'âmbar']]],
+    };
+    const STYLE = { cartao: 'Cartão', capa: 'Capa', brutal: 'Brutalista', deco: 'Art déco' };
+    const PHOTO = { barbearia: 'da barbearia', salao: 'do salão', estetica: 'da clínica de estética', tatuagem: 'do estúdio de tatuagem' };
+    const START = { style: 'cartao', photo: 'barbearia', primary: 'dourado', second: 1 };
+    const DEMO = [['primary', 'esmeralda'], ['second', 3], ['photo', 'salao'], ['style', 'capa']];
+    const GAP = 900, WIPE = 750, FADE = 260;
 
-    const show = (k, touch) => {
-      if (touch) {
-        tap.style.setProperty('--x', hits[k - 1].style.getPropertyValue('--x'));
-        tap.classList.remove('go'); void tap.offsetWidth; tap.classList.add('go');
-      }
-      if (k === cur) return;
-      const prev = shots[cur];
-      cur = k;
-      picks.forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.c === k)));
-      ed.style.setProperty('--pick', colour(k));
-      if (!k) { shots.forEach(i => i.classList.remove('on')); return; }
-      const img = shots[k];
-      img.style.zIndex = ++z;
-      img.classList.add('on');
-      // A tela anterior só sai depois que a nova cobriu tudo: sem piscar a do meio.
-      setTimeout(() => { if (prev !== shots[cur]) prev.classList.remove('on'); }, 180);
+    const src = s => `telas/marca/${s.style === 'deco' ? `deco-${s.primary}`
+      : s.style === 'cartao' ? `cartao-${s.photo}-${s.primary}-${s.second}`
+      : `${s.style}-${s.photo}-${s.primary}`}.webp`;
+    // A segunda cor só aparece no Cartão, e o Art déco não leva foto na tela
+    // inicial: escolher uma delas leva a um estilo em que ela aparece.
+    const next = (s, key, v) => {
+      const n = { ...s, [key]: v };
+      if (key === 'second' && s.style !== 'cartao') n.style = 'cartao';
+      if (key === 'photo' && s.style === 'deco') n.style = 'capa';
+      return n;
+    };
+    const describe = s => {
+      const [, secs] = PRIMARY[s.primary];
+      return `Tela inicial do app no estilo ${STYLE[s.style]}`
+        + (s.style === 'deco' ? '' : `, com a foto ${PHOTO[s.photo]}`)
+        + `, em ${s.primary}` + (s.style === 'cartao' ? ` e ${secs[s.second - 1][1]}` : '') + '.';
+    };
+    const press = (sel, on) => ed.querySelectorAll(sel).forEach(b => b.setAttribute('aria-pressed', String(on(b))));
+    const note = (ctl, off) => {
+      ctl.classList.toggle('off', off);
+      const n = ctl.querySelector('.ctl-note');
+      n.textContent = off ? n.dataset.off : n.dataset.on;
+    };
+    const sync = s => {
+      const [hex, secs] = PRIMARY[s.primary];
+      press('[data-style]', b => b.dataset.style === s.style);
+      press('[data-photo]', b => b.dataset.photo === s.photo);
+      press('[data-primary]', b => b.dataset.primary === s.primary);
+      ed.querySelectorAll('[data-second]').forEach((b, i) => {
+        b.style.setProperty('--c', secs[i][0]);
+        b.setAttribute('aria-label', secs[i][1][0].toUpperCase() + secs[i][1].slice(1));
+        b.setAttribute('aria-pressed', String(i + 1 === s.second));
+      });
+      note(ed.querySelector('[data-ctl="photo"]'), s.style === 'deco');
+      note(ed.querySelector('[data-ctl="second"]'), s.style !== 'cartao');
+      ed.style.setProperty('--pick', hex);
+      ed.style.setProperty('--pick2', s.style === 'cartao' ? secs[s.second - 1][0] : hex);
+    };
+    const pulse = b => {
+      if (!b || reduce) return;
+      b.classList.remove('press'); void b.offsetWidth; b.classList.add('press');
+    };
+    ed.addEventListener('animationend', e => e.target.classList?.remove('press'));
+
+    // Fotos das combinações vizinhas (um toque de distância) chegam antes de serem pedidas.
+    const warm = new Set();
+    const preload = s => {
+      const u = src(s);
+      if (warm.has(u)) return;
+      warm.add(u);
+      const i = new Image();
+      i.fetchPriority = 'low';
+      i.src = u;
+    };
+    const around = s => {
+      Object.keys(PRIMARY).forEach(v => preload(next(s, 'primary', v)));
+      Object.keys(PHOTO).forEach(v => preload(next(s, 'photo', v)));
+      Object.keys(STYLE).forEach(v => preload(next(s, 'style', v)));
+      [1, 2, 3].forEach(v => preload(next(s, 'second', v)));
     };
 
+    let cur = { ...START }, shown = src(cur), token = 0, warmT = 0;
+    warm.add(shown);
+    const show = (s, b) => {
+      const prev = cur;
+      cur = s;
+      sync(s);
+      pulse(b);
+      clearTimeout(warmT);
+      warmT = setTimeout(() => around(cur), 400);
+      const url = src(s);
+      if (url === shown) return;
+      shown = url;
+      const t = ++token, wipe = s.style !== prev.style;
+      const img = new Image(390, 844);
+      img.alt = describe(s);
+      img.src = url;
+      (img.decode ? img.decode() : Promise.resolve()).catch(() => {}).then(() => {
+        if (t !== token) return;
+        const old = [...screen.querySelectorAll('img')];
+        old.forEach(o => { o.alt = ''; });
+        screen.insertBefore(img, band);
+        const done = () => old.forEach(o => o.remove());
+        if (reduce) return done();
+        const timing = wipe ? { duration: WIPE, easing: 'cubic-bezier(.65, 0, .35, 1)' } : { duration: FADE, easing: 'linear' };
+        const a = wipe
+          ? img.animate({ clipPath: ['inset(0 100% 0 0)', 'inset(0 0% 0 0)'] }, timing)
+          : img.animate({ opacity: [0, 1] }, timing);
+        if (wipe) band.animate([
+          { transform: 'translateX(-100%)', opacity: 0 },
+          { opacity: 1, offset: .12 },
+          { opacity: 1, offset: .86 },
+          { transform: 'translateX(0)', opacity: 0 },
+        ], timing);
+        a.finished.then(done, done);
+      });
+    };
+
+    // A demonstração: cada toque pedido pela rolagem toca o controle e troca a
+    // tela, um de cada vez. Rolando de volta, a tela fica como está.
+    const stateAt = n => DEMO.slice(0, n).reduce((s, [k, v]) => next(s, k, v), { ...START });
+    let played = 0, want = 0, nextAt = 0, timer = 0, mine = false;
     const pump = () => {
       clearTimeout(timer);
       if (mine) return;
-      if (played > want) { played = want; show(want ? DEMO[want - 1] : 0, false); return; }
-      if (played === want) return;
+      if (played >= want) return;
       const wait = nextAt - performance.now();
       if (wait > 0) { timer = setTimeout(pump, wait); return; }
-      show(DEMO[played++], true);
+      const [k, v] = DEMO[played++];
+      show(next(cur, k, v), ed.querySelector(`[data-${k}="${v}"]`));
       nextAt = performance.now() + GAP;
       pump();
     };
+    const primeDemo = () => DEMO.forEach((_, n) => preload(stateAt(n + 1)));
+    ed.addEventListener('story:beats', e => {
+      if (!played && !want) primeDemo();
+      want = e.detail.n; pump();
+    });
 
-    const choose = k => { mine = true; clearTimeout(timer); show(k, true); };
-    picks.forEach(b => b.addEventListener('click', () => choose(+b.dataset.c)));
-    hits.forEach(h => h.addEventListener('click', () => choose(+h.dataset.c)));
-    ed.addEventListener('story:beats', e => { want = e.detail.n; pump(); });
+    ed.querySelector('.ed-ctl').addEventListener('click', e => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      const { style, photo, primary, second } = b.dataset;
+      const [k, v] = style ? ['style', style] : photo ? ['photo', photo] : primary ? ['primary', primary] : ['second', +second];
+      mine = true; clearTimeout(timer);
+      const s = next(cur, k, v);
+      show(s, b);
+      live.textContent = describe(s);
+    });
 
     // Sem a narrativa (menos movimento pedido, ou sem suporte), a demonstração
     // roda uma vez quando o editor aparece, se o movimento estiver liberado.
     document.addEventListener('DOMContentLoaded', () => {
       if (document.documentElement.classList.contains('story')) return;
-      if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
+      if (reduce || !('IntersectionObserver' in window)) return;
       const io = new IntersectionObserver(([e]) => {
         if (!e.isIntersecting) return;
         io.disconnect();
+        primeDemo();
         want = DEMO.length; nextAt = performance.now() + 600; pump();
       }, { threshold: .6 });
       io.observe(ed);

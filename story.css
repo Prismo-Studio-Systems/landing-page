@@ -72,7 +72,7 @@
 .story [data-p="side"] { translate: calc((1 - var(--r, 0)) * -1rem) 0; }
 
 /* ── Estilos do app: um celular só, a tela troca por cortina ── */
-.story .styles { display: grid; grid-template-areas: "s"; margin-top: clamp(1.5rem, 4vh, 3rem); gap: 0; }
+.story .styles { display: grid; grid-template-areas: "s"; grid-template-columns: minmax(0, 1fr); margin-top: clamp(1.5rem, 4vh, 3rem); gap: 0; }
 .story .styles figure, .story .styles figure:nth-child(even) {
   grid-area: s; margin: 0; width: 100%;
   display: grid; grid-template-columns: 22rem auto; justify-content: center; align-items: center;
